@@ -20,7 +20,7 @@
 </head>
 <body class="bg-slate-50 min-h-screen pb-12">
 
-<!-- 錯誤阻擋層 (無效網址用) -->
+<!-- 錯誤阻擋層 (網址錯誤用) -->
 <div id="errorOverlay" class="fixed inset-0 z-[200] bg-white/95 flex flex-col items-center justify-center p-10 text-center hidden">
     <div class="text-6xl mb-6">🔗</div>
     <h2 class="text-2xl font-black text-slate-800 mb-2">連結已失效或不正確</h2>
@@ -51,6 +51,7 @@
             <!-- 動態題目區 -->
             <div id="dynamicQuestions" class="space-y-4"></div>
 
+            <!-- 貴賓資料區 -->
             <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm space-y-5">
                 <h3 class="text-xs font-black text-blue-600 uppercase tracking-widest border-b pb-2 mb-2" data-i18n="guestInfo">貴賓資料 Information</h3>
                 
@@ -95,7 +96,7 @@
             <div class="p-8 space-y-6">
                 <p id="modalText" class="text-gray-600 font-bold text-sm leading-relaxed" data-i18n="modalText">我們已收到您的寶貴意見。</p>
                 <div class="space-y-3">
-                    <button id="marketingBtn" onclick="handleMarketing('Reviewed')" class="bg-amber-400 text-slate-900 block w-full font-black py-4 rounded-2xl shadow-lg text-lg flex items-center justify-center gap-2">
+                    <button onclick="handleMarketing('Reviewed')" class="bg-amber-400 text-slate-900 block w-full font-black py-4 rounded-2xl shadow-lg text-lg flex items-center justify-center gap-2">
                         <span>⭐</span> <span data-i18n="modalGoGoogle">馬上評論</span>
                     </button>
                     <button onclick="handleMarketing('Dismissed')" class="bg-slate-100 text-slate-400 block w-full font-bold py-3 rounded-2xl text-sm" data-i18n="modalClose">下次再評</button>
@@ -144,7 +145,6 @@
     const db = getFirestore(app);
     const analytics = getAnalytics(app);
 
-    // --- 全門市配置 ---
     const STORE_MAP = {
         'SID-ZG-101': { name: '中港行館', type: 'standard', google: 'https://maps.app.goo.gl/1Rto7b5TRNNF35yf8' },
         'SID-YL-102': { name: '員林行館', type: 'standard', google: 'https://maps.app.goo.gl/1Rto7b5TRNNF35yf8' },
@@ -195,12 +195,12 @@
         },
         ja: {
             title: "お客様満足度調査", branchLabel: "店舗", guestInfo: "お客様情報", masseurIdLabel: "スタッフ番号 *", custNameLabel: "お名前", phoneLabel: "お電話", suggestLabel: "ご意見", submitBtn: "アンケート送信", ph_masseur: "番号", ph_name: "お名前", ph_phone: "お電話", ph_suggest: "ご意見...", modalTitle: "ありがとうございます", modalText: "皆様のご意見が勵みになります。", modalGoGoogle: "レビューを書く", modalClose: "また今度",
-            errorModalTitle: "システムメンテナンス中", errorModalText: "サーバーが混雜しているか、メンテナンス中です。しばらくしてからもう一度お試しください。", errorModalBtn: "了解",
+            errorModalTitle: "システムメンテナンス中", errorModalText: "サーバーが混雑しているか、メンテナンス中です。しばらくしてからもう一度お試しください。", errorModalBtn: "了解",
             y: "はい", n: "いいえ", vs: "大変満足", s: "満足", o: "普通", u: "不満", vu: "非常に不滿"
         },
         ko: {
             title: "서비스 만족도 설문", branchLabel: "지점", guestInfo: "고객 정보", masseurIdLabel: "관리사 번호 *", custNameLabel: "성함", phoneLabel: "연락처", suggestLabel: "의견", submitBtn: "설문 제출", ph_masseur: "번호", ph_name: "성함", ph_phone: "연락처", ph_suggest: "의견을 남겨주세요...", modalTitle: "감사합니다", modalText: "고객님의 의견이 큰 힘이 됩니다。", modalGoGoogle: "리뷰 남기기", modalClose: "닫기",
-            errorModalTitle: "系統 점검 중", errorModalText: "현재 서버가 혼잡하거나 점검 중입니다. 잠시 후 다시 시度해 주세요。", errorModalBtn: "확인"
+            errorModalTitle: "계통 점검 중", errorModalText: "현재 서버가 혼잡하거나 점검 중입니다. 잠시 후 다시 시도해 주세요。", errorModalBtn: "확인"
         }
     };
 
