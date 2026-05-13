@@ -16,11 +16,12 @@
         #successModal, #errorModal { transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
         input:checked + span { color: #2563eb; font-weight: 900; }
         #errorOverlay { backdrop-filter: blur(12px); }
+        @keyframes spin-slow { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .animate-spin-slow { animation: spin-slow 8s linear infinite; }
     </style>
 </head>
 <body class="bg-slate-50 min-h-screen pb-12">
 
-<!-- 錯誤阻擋層 (網址錯誤用) -->
 <div id="errorOverlay" class="fixed inset-0 z-[200] bg-white/95 flex flex-col items-center justify-center p-10 text-center hidden">
     <div class="text-6xl mb-6">🔗</div>
     <h2 class="text-2xl font-black text-slate-800 mb-2">連結已失效或不正確</h2>
@@ -30,7 +31,7 @@
 <div id="app" class="max-w-md mx-auto">
     <header class="bg-white sticky top-0 z-20 shadow-sm px-4 py-4 mb-4 text-center">
         <h1 class="text-xl font-black text-gray-800" data-i18n="title">服務意見調查表</h1>
-        <p id="conn-status" class="text-[9px] text-gray-300 font-mono tracking-tighter uppercase mt-1">System Initializing...</p>
+        <p id="conn-status" class="text-[9px] text-gray-300 font-mono tracking-tighter uppercase mt-1">Initializing Secure SDK...</p>
         
         <div class="flex justify-between gap-1 bg-gray-100 p-1 rounded-2xl border border-gray-200 mt-4">
             <button onclick="window.changeLang('zh')" id="btn-zh" class="lang-btn active flex-1 py-2.5 rounded-xl text-xs font-bold">中文</button>
@@ -42,6 +43,7 @@
 
     <main class="px-4 space-y-4">
         <form id="surveyForm" class="space-y-4">
+            <!-- 門市顯示 -->
             <div class="bg-white p-6 rounded-3xl border border-blue-100 shadow-sm">
                 <label class="block text-[10px] font-bold text-blue-400 mb-1 uppercase tracking-tighter" data-i18n="branchLabel">服務分店</label>
                 <div class="flex items-center text-gray-800 font-black text-xl italic">📍 <span id="storeNameText">---</span></div>
@@ -50,6 +52,7 @@
             <!-- 動態題目區 -->
             <div id="dynamicQuestions" class="space-y-4"></div>
 
+            <!-- 客資區 -->
             <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm space-y-5">
                 <h3 class="text-xs font-black text-blue-600 uppercase tracking-widest border-b pb-2 mb-2" data-i18n="guestInfo">貴賓資料 Information</h3>
                 
@@ -104,162 +107,132 @@
     </div>
 
     <!-- 錯誤彈窗 (維修圖示) -->
-    <div id="errorModal" class="fixed inset-0 z-[150] flex items-center justify-center p-6 bg-slate-900/80 backdrop-blur-md modal-hide">
+    <div id="errorModal" class="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-slate-900/80 backdrop-blur-md modal-hide">
         <div class="bg-white w-full max-w-sm rounded-[2.5rem] overflow-hidden shadow-2xl text-center border-b-8 border-red-500">
             <div class="bg-slate-800 py-10 text-white">
                 <div class="mb-4 flex justify-center">
-                    <div class="w-20 h-20 bg-white rounded-full flex items-center justify-center p-3 shadow-lg">
-                        <img src="https://cdn-icons-png.flaticon.com/512/1004/1004739.png" alt="Maintenance" class="w-full h-full object-contain">
-                    </div>
+                    <svg class="w-20 h-20 text-white animate-spin-slow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37a1.724 1.724 0 002.572-1.065z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    </svg>
                 </div>
                 <h3 class="text-2xl font-black italic" data-i18n="errorModalTitle">系統維護中</h3>
             </div>
             <div class="p-8 space-y-6">
-                <p class="text-gray-600 font-bold text-sm leading-relaxed" data-i18n="errorModalText">目前伺服器連線繁忙或正在維護，請稍後再試。</p>
-                <button onclick="closeModal('errorModal')" class="bg-slate-800 text-white block w-full font-black py-4 rounded-2xl shadow-lg text-lg" data-i18n="errorModalBtn">我知道了</button>
+                <p class="text-gray-600 font-bold text-sm leading-relaxed" data-i18n="errorModalText">目前系統正在進行數據校準，請稍後再試。</p>
+                <button onclick="location.reload()" class="bg-slate-800 text-white block w-full font-black py-4 rounded-2xl shadow-lg text-lg" data-i18n="errorModalBtn">重新載入</button>
             </div>
         </div>
     </div>
 </div>
 
 <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-    import { getAnalytics, logEvent } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-analytics.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+    import { getAnalytics, logEvent } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-analytics.js";
+    import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+    import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
     const firebaseConfig = {
-        apiKey: "AIzaSyCuytMbR0wfPk0vChxqI66Zci0uJtGiizE",
-        authDomain: "survey-c3aa5.firebaseapp.com",
-        projectId: "survey-c3aa5",
-        storageBucket: "survey-c3aa5.firebasestorage.app",
-        messagingSenderId: "874594469122",
-        appId: "1:874594469122:web:2b2c1208b20d2095b9ae1b",
-        measurementId: "G-B5T1318ZR4"
+        apiKey: "AIzaSyBY2RVaNjkKMJJAdm3_uLeiBhcDaXZEhFY",
+        authDomain: "surveys2-ff8a8.firebaseapp.com",
+        projectId: "surveys2-ff8a8",
+        storageBucket: "surveys2-ff8a8.firebasestorage.app",
+        messagingSenderId: "147800559221",
+        appId: "1:147800559221:web:18df683290fee3324fb23c",
+        measurementId: "G-6F0HNMSCCB"
     };
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-    const analytics = getAnalytics(app);
+    const firebaseApp = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(firebaseApp);
+    const auth = getAuth(firebaseApp);
+    const db = getFirestore(firebaseApp);
 
+    // --- 23 門市地圖 ---
     const STORE_MAP = {
-        'SID-ZG-101': { name: '中港行館', type: 'standard', google: 'https://maps.app.goo.gl/1Rto7b5TRNNF35yf8' },
-        'SID-YL-102': { name: '員林行館', type: 'standard', google: 'https://maps.app.goo.gl/1Rto7b5TRNNF35yf8' },
-        'SID-ZQ-103': { name: '中清行館', type: 'standard', google: 'https://maps.app.goo.gl/1Rto7b5TRNNF35yf8' },
-        'SID-DL-104': { name: '大里行館', type: 'standard', google: 'https://maps.app.goo.gl/1Rto7b5TRNNF35yf8' },
-        'SID-ZK-105': { name: '中科行館', type: 'standard', google: 'https://maps.app.goo.gl/1Rto7b5TRNNF35yf8' },
-        'SID-SL-106': { name: '沙鹿行館', type: 'standard', google: 'https://maps.app.goo.gl/1Rto7b5TRNNF35yf8' },
-        'SID-AH-107': { name: '愛河行館', type: 'standard', google: 'https://maps.app.goo.gl/1Rto7b5TRNNF35yf8' },
-        'SID-FS-108': { name: '鳳山行館', type: 'standard', google: 'https://maps.app.goo.gl/1Rto7b5TRNNF35yf8' },
-        'SID-ZY-109': { name: '左營行館', type: 'standard', google: 'https://maps.app.goo.gl/1Rto7b5TRNNF35yf8' },
-        'SID-SD-110': { name: '三多行館', type: 'standard', google: 'https://maps.app.goo.gl/1Rto7b5TRNNF35yf8' },
-        'SID-MS-111': { name: '美術館行館', type: 'standard', google: 'https://maps.app.goo.gl/1Rto7b5TRNNF35yf8' },
-        'SID-FQ-112': { name: '府前行館', type: 'standard', google: 'https://maps.app.goo.gl/1Rto7b5TRNNF35yf8' },
-        'SID-AP-113': { name: '安平行館', type: 'standard', google: 'https://maps.app.goo.gl/1Rto7b5TRNNF35yf8' },
-        'SID-XS-114': { name: '新生行館', type: 'standard', google: 'https://maps.app.goo.gl/1Rto7b5TRNNF35yf8' },
-        'SID-XY-115': { name: '信義行館', type: 'standard', google: 'https://maps.app.goo.gl/1Rto7b5TRNNF35yf8' },
-        'SID-ZL-116': { name: '中壢行館', type: 'standard', google: 'https://maps.app.goo.gl/1Rto7b5TRNNF35yf8' },
-        'SID-ZB-117': { name: '竹北行館', type: 'standard', google: 'https://maps.app.goo.gl/1Rto7b5TRNNF35yf8' },
-        'SID-TP-118': { name: '太平店', type: 'standard', google: 'https://maps.app.goo.gl/1Rto7b5TRNNF35yf8' },
-        'SID-FY-119': { name: '豐原行館', type: 'standard', google: 'https://maps.app.goo.gl/1Rto7b5TRNNF35yf8' },
-        'SID-DX-120': { name: '東興店', type: 'standard', google: 'https://maps.app.goo.gl/1Rto7b5TRNNF35yf8' },
-        'SID-WQ-121': { name: '五權店', type: 'standard', google: 'https://maps.app.goo.gl/1Rto7b5TRNNF35yf8' },
+        'SID-ZG-101': { name: '中港行館', type: 'std', google: 'https://maps.app.goo.gl/1Rto7b5TRNNF35yf8' },
+        'SID-YL-102': { name: '員林行館', type: 'std', google: 'https://maps.app.goo.gl/1Rto7b5TRNNF35yf8' },
+        'SID-ZQ-103': { name: '中清行館', type: 'std', google: 'https://maps.app.goo.gl/1Rto7b5TRNNF35yf8' },
+        'SID-DL-104': { name: '大里行館', type: 'std', google: 'https://maps.app.goo.gl/1Rto7b5TRNNF35yf8' },
+        'SID-ZK-105': { name: '中科行館', type: 'std', google: 'https://maps.app.goo.gl/1Rto7b5TRNNF35yf8' },
+        'SID-SL-106': { name: '沙鹿行館', type: 'std', google: 'https://maps.app.goo.gl/1Rto7b5TRNNF35yf8' },
+        'SID-AH-107': { name: '愛河行館', type: 'std', google: 'https://maps.app.goo.gl/1Rto7b5TRNNF35yf8' },
+        'SID-FS-108': { name: '鳳山行館', type: 'std', google: 'https://maps.app.goo.gl/1Rto7b5TRNNF35yf8' },
+        'SID-ZY-109': { name: '左營行館', type: 'std', google: 'https://maps.app.goo.gl/1Rto7b5TRNNF35yf8' },
+        'SID-SD-110': { name: '三多行館', type: 'std', google: 'https://maps.app.goo.gl/1Rto7b5TRNNF35yf8' },
+        'SID-MS-111': { name: '美術館行館', type: 'std', google: 'https://maps.app.goo.gl/1Rto7b5TRNNF35yf8' },
+        'SID-FQ-112': { name: '府前行館', type: 'std', google: 'https://maps.app.goo.gl/1Rto7b5TRNNF35yf8' },
+        'SID-AP-113': { name: '安平行館', type: 'std', google: 'https://maps.app.goo.gl/1Rto7b5TRNNF35yf8' },
+        'SID-XS-114': { name: '新生行館', type: 'std', google: 'https://maps.app.goo.gl/1Rto7b5TRNNF35yf8' },
+        'SID-XY-115': { name: '信義行館', type: 'std', google: 'https://maps.app.goo.gl/1Rto7b5TRNNF35yf8' },
+        'SID-ZL-116': { name: '中壢行館', type: 'std', google: 'https://maps.app.goo.gl/1Rto7b5TRNNF35yf8' },
+        'SID-ZB-117': { name: '竹北行館', type: 'std', google: 'https://maps.app.goo.gl/1Rto7b5TRNNF35yf8' },
+        'SID-TP-118': { name: '太平店', type: 'std', google: 'https://maps.app.goo.gl/1Rto7b5TRNNF35yf8' },
+        'SID-FY-119': { name: '豐原行館', type: 'std', google: 'https://maps.app.goo.gl/1Rto7b5TRNNF35yf8' },
+        'SID-DX-120': { name: '東興店', type: 'std', google: 'https://maps.app.goo.gl/1Rto7b5TRNNF35yf8' },
+        'SID-WQ-121': { name: '五權店', type: 'std', google: 'https://maps.app.goo.gl/1Rto7b5TRNNF35yf8' },
         'SID-PS-8892': { name: '帕夏健髮頭皮管理-公益店', type: 'pasha', google: 'https://maps.app.goo.gl/JYrfS6tjnXe2b5Zg6?g_st=ac' },
         'SID-JS-3310': { name: '婧仕女微旅', type: 'jing', google: 'https://maps.app.goo.gl/6axGD9A8D4jQ3oHX6?g_st=ac' }
     };
 
+    // --- STREAMING_CHUNK:Defining full multi-language dictionaries... ---
     const dicts = {
         zh: {
-            title: "服務意見調查表", branchLabel: "服務分店", guestInfo: "貴賓資料 Information", masseurIdLabel: "師傅號碼 *", custNameLabel: "姓名", phoneLabel: "電話", suggestLabel: "建議內容詳述", submitBtn: "提交問卷 Submit", ph_masseur: "編號", ph_name: "姓名", ph_phone: "電話", ph_suggest: "您的寶貴意見...", modalTitle: "感謝您的回饋！", modalText: "您的支持是我們進步的動力。<br>邀請您留下 5 星好評！", modalGoGoogle: "馬上評論", modalClose: "下次再評",
-            errorModalTitle: "系統維護中", errorModalText: "目前伺服器連線繁忙或正在維護，請稍後再試，或告知現場服務人員。", errorModalBtn: "我知道了",
-            y: "是", n: "否", vs: "非常滿意", s: "滿意", o: "還好", u: "不滿意", vu: "非常不滿意",
+            title: "服務意見調查表", branchLabel: "服務分店", guestInfo: "貴賓資料", masseurIdLabel: "師傅號碼 *", custNameLabel: "姓名", phoneLabel: "電話", suggestLabel: "建議內容詳述", submitBtn: "提交問卷 Submit", ph_masseur: "編號", ph_name: "姓名", ph_phone: "電話", ph_suggest: "您的意見...", modalTitle: "感謝您的回饋！", modalText: "您的支持是我們進步的動力。", modalGoGoogle: "馬上評論", modalClose: "下次再評", errorModalTitle: "系統維護中", errorModalText: "目前系統正在進行數據校準，請稍後再試。", errorModalBtn: "重新載入",
+            y: "是", n: "否", vs: "非常滿意", s: "滿意", o: "還好", u: "不滿意", vu: "非常不滿意", vp: "非常專業", up: "不專業", vc: "非常舒服", uc: "不舒服", cl: "非常清楚", unl: "不清楚",
+            q1: "服務開始有介紹號碼詢問消費項目嗎？", q1_1: "主動介紹詢問", q1_2: "後來才問", q1_3: "完全沒問",
+            q2: "服務過程有主動詢問調整力道大小嗎？", q2_1: "主動詢問調整", q2_2: "被動回應", q2_3: "完全不問",
+            q3: "師傅身上有異味或煙味讓您不舒服嗎？", q3_1: "沒有異味", q3_2: "稍微有點", q3_3: "味道很重",
+            q10: "今天服務的師傅會讓您下次再老點他嗎？", q10_1: "一定老點", q10_2: "再試試看", q10_3: "絕對不會",
             age: "您的年齡", age1: "20歲以下", age2: "21-30歲", age3: "31-40歲", age4: "41-50歲", age5: "51歲以上",
-            src: "從哪裡得知我們？", src1: "網路廣告", src2: "FB/IG/Threads", src3: "親友介紹", src4: "實體海報", src5: "集團品牌", src6: "路過",
-            svc: "體驗項目 (可複選)", svc1: "臉部甦妍-保濕", svc2: "臉部甦妍-小氣泡", svc3: "精油按摩", svc4: "熱石能量", svc5: "全身去角質", svc6: "耳燭", svc9: "頭皮養護", svc15: "岩盤浴", svc16: "水療SPA",
-            sat_svc: "設施/療程滿意度", sat_book: "預約流程滿意度", sat_env: "環境舒適度", sat_intro: "櫃台服務介紹", sat_att: "人員服務態度", sat_pro: "療程專業度", sat_relax: "放鬆與舒適感", sat_total: "整體滿意度",
-            rec: "願意推薦給親友", rev: "願意再次光臨", frm: "從哪裡來訪", f_n: "北部", f_c: "中部", f_s: "南部", f_e: "東部",
-            rm: "房型項目", rm1: "單人床位", rm2: "豪華單人", rm3: "單人房", rm4: "雙人房", rm5: "四人房",
-            q1: "服務開始有介紹號碼與詢問項目嗎?", q1_1: "主動介紹", q1_2: "後來才問", q1_3: "完全沒問",
-            q2: "過程有主動詢問力道嗎?", q2_1: "主動詢問", q2_2: "被動回應", q2_3: "完全不問",
-            q3: "師傅是否有異味或煙味?", q3_1: "沒有異味", q3_2: "稍微有點", q3_3: "味道很重",
-            q10: "下次還會想老點他嗎?", q10_1: "一定老點", q10_2: "再試試看", q10_3: "絕對不會"
+            src: "從哪裡得知本品牌的？", src1: "網路廣告", src2: "FB/IG/Threads", src3: "親友介紹", src4: "實體海報", src5: "集團品牌", src6: "路過",
+            svc: "本次體驗項目 (可複選)", svc1: "臉部甦妍-保濕", svc2: "臉部甦妍-小氣泡", svc3: "精油按摩", svc4: "熱石能量", svc5: "全身去角質", svc6: "耳燭", svc9: "頭皮養護", svc15: "岩盤浴", svc16: "水療SPA",
+            frm: "從哪裡來訪？", f_n: "北部", f_c: "中部", f_s: "南部", f_e: "東部",
+            rm: "入住房型項目", rm1: "單人床位", rm2: "豪華單人床", rm3: "單人房", rm4: "雙人房", rm5: "四人房",
+            sat_svc: "設施/療程滿意度", sat_book: "預約流程順暢度", sat_env: "店內環境舒適度", sat_intro: "櫃台人員介紹清楚嗎", sat_att: "人員服務態度", sat_pro: "療程專業度", sat_relax: "放鬆與舒適感", sat_total: "整體滿意度", sat_rm: "房間環境滿意度", sat_spa: "水療設施滿意度", rec: "是否推薦給親友", rev: "是否再次光臨"
         },
         en: {
-            title: "Service Survey", branchLabel: "Branch", guestInfo: "Guest Information", masseurIdLabel: "Staff ID *", custNameLabel: "Name", phoneLabel: "Phone", suggestLabel: "Feedback", submitBtn: "Submit Survey", ph_masseur: "ID", ph_name: "Name", ph_phone: "Phone", ph_suggest: "Your suggestions...", modalTitle: "Thank You!", modalText: "We value your support.", modalGoGoogle: "Review Now", modalClose: "Later",
-            errorModalTitle: "Under Maintenance", errorModalText: "The server is currently busy or under maintenance. Please try again later.", errorModalBtn: "Got it",
-            y: "Yes", n: "No", vs: "Excellent", s: "Good", o: "Fair", u: "Poor", vu: "Bad",
-            age: "Your Age", age1: "Under 20", age2: "21-30", age3: "31-40", age4: "41-50", age5: "Above 51",
-            src: "How did you hear about us?", src1: "Online Ads", src2: "SNS", src3: "Friends", src4: "Poster", src5: "Brand", src6: "Passing by",
-            svc: "Service (Multiple)", svc1: "Facial-Hydra", svc2: "Facial-Bubble", svc3: "Oil Massage", svc4: "Hot Stone", svc5: "Body Scrub", svc6: "Ear Candle", svc9: "Scalp Care", svc15: "Stone Bed", svc16: "SPA",
-            sat_svc: "Service Satisfaction", sat_book: "Booking Flow", sat_env: "Environment", sat_intro: "Front Desk Intro", sat_att: "Staff Attitude", sat_pro: "Professionalism", sat_relax: "Relaxation", sat_total: "Overall Sat.",
-            rec: "Recommend to friends", rev: "Revisit in future", frm: "Where from", f_n: "North", f_c: "Central", f_s: "South", f_e: "East",
-            rm: "Room Type", rm1: "Single Bed", rm2: "Deluxe Single", rm3: "Private Rm", rm4: "Double Rm", rm5: "Four-bed Rm",
-            q1: "ID Intro at start?", q1_1: "Proactive", q1_2: "Later", q1_3: "None",
-            q2: "Pressure check?", q2_1: "Proactive", q2_2: "Passive", q2_3: "None",
-            q3: "Unpleasant odor?", q3_1: "None", q3_2: "A little", q3_3: "Strong",
-            q10: "Would you re-book?", q10_1: "Definitely", q10_2: "Maybe", q10_3: "Never"
+            title: "Service Survey", branchLabel: "Branch", guestInfo: "Info", masseurIdLabel: "Staff ID *", custNameLabel: "Name", phoneLabel: "Phone", submitBtn: "Submit", ph_masseur: "No.", ph_name: "Name", ph_phone: "Phone", ph_suggest: "Feedback...", modalTitle: "Thank You!", modalText: "We value your feedback.", modalGoGoogle: "Review", modalClose: "Later", errorModalTitle: "Maintenance", errorModalText: "System update in progress.", errorModalBtn: "Reload",
+            y: "Yes", n: "No", vs: "Great", s: "Good", o: "Fair", u: "Poor", vu: "Bad", vp: "Pro", up: "No", vc: "Comf", uc: "No", cl: "Clear", unl: "No",
+            age: "Age", age1: "Under 20", age2: "21-30", age3: "31-40", age4: "41-50", age5: "Above 51"
         },
         ja: {
-            title: "お客様満足度調査", branchLabel: "店舗", guestInfo: "お客様情報", masseurIdLabel: "スタッフ番号 *", custNameLabel: "お名前", phoneLabel: "お電話", suggestLabel: "ご意見", submitBtn: "アンケート送信", ph_masseur: "番号", ph_name: "お名前", ph_phone: "お電話", ph_suggest: "ご意見...", modalTitle: "ありがとうございます", modalText: "皆様のご意見が励みになります。", modalGoGoogle: "レビューを書く", modalClose: "また今度",
-            errorModalTitle: "システムメンテナンス中", errorModalText: "サーバーが混雑しているか、メンテナンス中です。しばらくしてからもう一度お試しください。", errorModalBtn: "了解",
-            y: "はい", n: "いいえ", vs: "大変満足", s: "満足", o: "普通", u: "不滿", vu: "非常に不滿",
-            age: "年齢", age1: "20歳以下", age2: "21-30歳", age3: "31-40歳", age4: "41-50歳", age5: "51歲以上",
-            src: "どこで知りましたか？", src1: "ネット広告", src2: "SNS", src3: "友人紹介", src4: "ポスター", src5: "ブランド", src6: "通りがかり",
-            svc: "体験コース (複数可)", svc1: "フェイシャル保湿", svc2: "フェイシャル小気泡", svc3: "アロマオイル", svc4: "ホットストーン", svc5: "ボディスクラブ", svc6: "イヤーキャンドル", svc9: "頭皮ケア", svc15: "岩盤浴", svc16: "SPA",
-            sat_svc: "施術満足度", sat_book: "予約の流れ", sat_env: "環境の快適さ", sat_intro: "受付の説明", sat_att: "スタッフの態度", sat_pro: "専門性", sat_relax: "リラックス感", sat_total: "全体満足度",
-            rec: "推薦したいですか？", rev: "再来店したいですか？", frm: "どちらからお越しですか？", f_n: "北部", f_c: "中部", f_s: "南部", f_e: "東部",
-            rm: "お部屋タイプ", rm1: "シングルベッド", rm2: "デラックスシングル", rm3: "個室", rm4: "ダブルルーム", rm5: "フォースルーム",
-            q1: "番号紹介はありましたか？", q1_1: "積極的", q1_2: "後で", q1_3: "なし",
-            q2: "力加減の確認は？", q2_1: "積極的", q2_2: "受動的", q2_3: "なし",
-            q3: "不快な臭いは？", q3_1: "なし", q3_2: "少し気になる", q3_3: "非常に気になる",
-            q10: "次回も指名しますか？", q10_1: "必ず指名", q10_2: "検討中", q10_3: "しない"
+            title: "アンケート", branchLabel: "店舗", submitBtn: "送信", masseurIdLabel: "スタッフ番号 *", ph_masseur: "番号", custNameLabel: "お名前", phoneLabel: "電話番号", errorModalTitle: "メンテナンス中", errorModalText: "現在メンテナンス中です。", errorModalBtn: "リロード",
+            y: "はい", n: "いいえ", vs: "大変満足", s: "満足", o: "普通", u: "不満", vu: "大変不満", vp: "非常に專業", up: "不專業", vc: "快適", uc: "不快", cl: "明確", unl: "不明確",
+            age: "年齢", age1: "20歲以下", age2: "21-30歲", age3: "31-40歲", age4: "41-50歲", age5: "51歲以上"
         },
         ko: {
-            title: "서비스 만족도 설문", branchLabel: "지점", guestInfo: "고객 정보", masseurIdLabel: "관리사 번호 *", custNameLabel: "성함", phoneLabel: "연락처", suggestLabel: "의견", submitBtn: "설문 제출", ph_masseur: "번호", ph_name: "성함", ph_phone: "연락처", ph_suggest: "의견을 남겨주세요...", modalTitle: "감사합니다", modalText: "고객님의 의견이 큰 힘이 됩니다。", modalGoGoogle: "리뷰 남기기", modalClose: "닫기",
-            errorModalTitle: "계통 점검 중", errorModalText: "현재 서버가 혼잡하거나 점검 중입니다. 잠시 후 다시 시도해 주세요。", errorModalBtn: "확인",
-            y: "예", n: "아니오", vs: "매우 만족", s: "만족", o: "보통", u: "불만족", vu: "매우 불만족",
-            age: "연령대", age1: "20세 이하", age2: "21-30세", age3: "31-40세", age4: "41-50세", age5: "51세 이상",
-            src: "어떻게 알고 오셨나요?", src1: "인터넷 광고", src2: "SNS", src3: "지인 추천", src4: "포스터", src5: "브랜드 소개", src6: "방문",
-            svc: "체험 항목 (중복 선택 가능)", svc1: "페이셜 보습", svc2: "페이셜 버블", svc3: "아로마 오일", svc4: "핫스톤", svc5: "바디 스크럽", svc6: "이어 캔들", svc9: "두피 케어", svc15: "암반욕", svc16: "SPA",
-            sat_svc: "시설/시술 만족도", sat_book: "예약 만족도", sat_env: "환경 만족도", sat_intro: "직원 안내", sat_att: "관리사 태도", sat_pro: "전문성", sat_relax: "편안함", sat_total: "종합 만족도",
-            rec: "추천 의향", rev: "재방문 의향", frm: "방문 지역", f_n: "북부", f_c: "중부", f_s: "남부", f_e: "동부",
-            rm: "객실 타입", rm1: "싱글 베드", rm2: "디럭스 싱글", rm3: "개인실", rm4: "더블룸", rm5: "포베드룸",
-            q1: "번호 안내가 있었나요?", q1_1: "적극 안내", q1_2: "나중에", q1_3: "없음",
-            q2: "압력 확인이 있었나요?", q2_1: "적극 확인", q2_2: "수동적", q2_3: "없음",
-            q3: "불쾌한 냄새가 있었나요?", q3_1: "전혀 없음", q3_2: "약간 있음", q3_3: "심함",
-            q10: "다시 지명하시겠습니까?", q10_1: "꼭 지명", q10_2: "생각 중", q10_3: "안 함"
+            title: "설문조사", branchLabel: "지점", submitBtn: "제출", masseurIdLabel: "관리사 번호 *", custNameLabel: "성함", phoneLabel: "전화번호", errorModalTitle: "시스템 점검 중", errorModalText: "현재 점검 중입니다.", errorModalBtn: "새로고침",
+            y: "예", n: "아니오", vs: "매우 만족", s: "만족", o: "보통", u: "불만족", vu: "매우 불만족", vp: "전문적", up: "비전문", vc: "편안", uc: "불편", cl: "명확", unl: "모름",
+            age: "연령", age1: "20세 이하", age2: "21-30세", age3: "31-40세", age4: "41-50세", age5: "51세 이상"
         }
     };
 
     let activeSid = null;
-    let activeLang = 'zh';
+    let currentLang = 'zh';
 
+    // --- STREAMING_CHUNK:Initializing branch specific logic and rendering questions... ---
     function init() {
-        const urlParams = new URLSearchParams(window.location.search);
-        activeSid = urlParams.get('sid');
+        const params = new URLSearchParams(window.location.search);
+        activeSid = params.get('sid');
         
         if (!activeSid || !STORE_MAP[activeSid]) {
             document.getElementById('errorOverlay').classList.remove('hidden');
             return;
         }
 
-        const config = STORE_MAP[activeSid];
-        const isSpecial = (activeSid === 'SID-PS-8892' || activeSid === 'SID-JS-3310');
-        const nameInput = document.getElementById('custName');
-        const phoneInput = document.getElementById('custPhone');
+        document.getElementById('storeNameText').innerText = STORE_MAP[activeSid].name;
+        renderQuestions();
         
-        // 針對特殊門市強制姓名電話，其餘選填
+        // 帕夏、婧仕女 姓名電話必填
+        const isSpecial = (activeSid === 'SID-PS-8892' || activeSid === 'SID-JS-3310');
         if (isSpecial) {
-            nameInput.setAttribute('required', 'true');
-            phoneInput.setAttribute('required', 'true');
+            document.getElementById('custName').setAttribute('required', 'true');
+            document.getElementById('custPhone').setAttribute('required', 'true');
         } else {
-            nameInput.removeAttribute('required');
-            phoneInput.removeAttribute('required');
+            document.getElementById('custName').removeAttribute('required');
+            document.getElementById('custPhone').removeAttribute('required');
         }
 
-        document.getElementById('storeNameText').innerText = config.name;
-        renderQuestions();
         window.changeLang('zh');
     }
 
@@ -269,135 +242,133 @@
         const config = STORE_MAP[activeSid];
         let qList = [];
 
-        if (config.type === 'standard') {
+        if (config.type === 'std') {
             document.getElementById('masseurSection').style.display = 'block';
             document.getElementById('masseurId').setAttribute('required', 'true');
-            for(let i=1; i<=10; i++) {
-                if([1,2,3,10].includes(i)) {
-                    qList.push({ id: `q${i}`, type: 'radio', options: [`q${i}_1`, `q${i}_2`, `q${i}_3`] });
-                } else {
-                    qList.push({ id: `sat_${i}`, labelKey: i==4?'sat_svc':i==5?'sat_att':i==6?'sat_pro':i==7?'sat_relax':i==8?'sat_book':'sat_total', type: 'radio', options: ['vs', 's', 'o', 'u', 'vu'] });
-                }
-            }
-        } else {
+            qList = [
+                { id: 'q1', type: 'radio', options: ['q1_1','q1_2','q1_3'] },
+                { id: 'q2', type: 'radio', options: ['q2_1','q2_2','q2_3'] },
+                { id: 'q3', type: 'radio', options: ['q3_1','q3_2','q3_3'] },
+                { id: 'sat_svc', type: 'radio', options: ['vs','s','o','u','vu'] },
+                { id: 'sat_att', type: 'radio', options: ['vs','s','o','u','vu'] },
+                { id: 'sat_pro', type: 'radio', options: ['vs','o','vu'] },
+                { id: 'sat_relax', type: 'radio', options: ['vs','o','vu'] },
+                { id: 'sat_book', type: 'radio', options: ['vs','s','o','u','vu'] },
+                { id: 'sat_total', type: 'radio', options: ['vs','s','o','u','vu'] },
+                { id: 'q10', type: 'radio', options: ['q10_1','q10_2','q10_3'] }
+            ];
+        } else if (config.type === 'pasha') {
             document.getElementById('masseurSection').style.display = 'none';
             document.getElementById('masseurId').removeAttribute('required');
-            if (config.type === 'pasha') {
-                qList = [
-                    { id: 'age', type: 'radio', options: ['age1','age2','age3','age4','age5'] },
-                    { id: 'src', type: 'radio', options: ['src1','src2','src3','src4','src5','src6'] },
-                    { id: 'svc', type: 'checkbox', options: ['svc1','svc2','svc3','svc4','svc5','svc6','svc9','svc15','svc16'] },
-                    { id: 'sat_svc', type: 'radio', options: ['vs','s','o','u','vu'] },
-                    { id: 'sat_total', type: 'radio', options: ['vs','s','o','u','vu'] },
-                    { id: 'rec', type: 'radio', options: ['y','n'] },
-                    { id: 'rev', type: 'radio', options: ['y','n'] }
-                ];
-            } else if (config.type === 'jing') {
-                qList = [
-                    { id: 'age', type: 'radio', options: ['age1','age2','age3','age4','age5'] },
-                    { id: 'frm', type: 'radio', options: ['f_n','f_c','f_s','f_e'] },
-                    { id: 'src', type: 'radio', options: ['src1','src2','src3','src4','src5','src6'] },
-                    { id: 'rm', type: 'radio', options: ['rm1','rm2','rm3','rm4','rm5'] },
-                    { id: 'sat_total', type: 'radio', options: ['vs','s','o','u','vu'] },
-                    { id: 'rec', type: 'radio', options: ['y','n'] },
-                    { id: 'rev', type: 'radio', options: ['y','n'] }
-                ];
-            }
+            qList = [
+                { id: 'age', type: 'radio', options: ['age1','age2','age3','age4','age5'] },
+                { id: 'src', type: 'radio', options: ['src1','src2','src3','src4','src5','src6'] },
+                { id: 'svc', type: 'checkbox', options: ['svc1','svc2','svc3','svc4','svc5','svc6','svc9','svc15','svc16'] },
+                { id: 'rev', type: 'radio', options: ['y','n'] },
+                { id: 'sat_svc', type: 'radio', options: ['vs','s','o','u','vu'] },
+                { id: 'sat_book', type: 'radio', options: ['vs','s','o','u','vu'] },
+                { id: 'sat_env', type: 'radio', options: ['vs','s','o','u','vu'] },
+                { id: 'sat_intro', type: 'radio', options: ['cl','s','o','unl'] },
+                { id: 'sat_att', type: 'radio', options: ['vs','s','o','u','vu'] },
+                { id: 'sat_pro', type: 'radio', options: ['vs','o','vu'] },
+                { id: 'sat_relax', type: 'radio', options: ['vs','o','vu'] },
+                { id: 'sat_total', type: 'radio', options: ['vs','s','o','u','vu'] },
+                { id: 'rec', type: 'radio', options: ['y','n'] }
+            ];
+        } else if (config.type === 'jing') {
+            document.getElementById('masseurSection').style.display = 'none';
+            document.getElementById('masseurId').removeAttribute('required');
+            qList = [
+                { id: 'age', type: 'radio', options: ['age1','age2','age3','age4','age5'] },
+                { id: 'frm', type: 'radio', options: ['f_n','f_c','f_s','f_e'] },
+                { id: 'src', type: 'radio', options: ['src1','src2','src3','src4','src5','src6'] },
+                { id: 'rm', type: 'radio', options: ['rm1','rm2','rm3','rm4','rm5'] },
+                { id: 'rev', type: 'radio', options: ['y','n'] },
+                { id: 'sat_book', type: 'radio', options: ['vs','s','o','u','vu'] },
+                { id: 'sat_rm', type: 'radio', options: ['vs','s','o','u','vu'] },
+                { id: 'sat_env', type: 'radio', options: ['vs','s','o','u','vu'] },
+                { id: 'sat_intro', type: 'radio', options: ['cl','s','o','unl'] },
+                { id: 'sat_spa', type: 'radio', options: ['vs','s','o','u','vu'] },
+                { id: 'sat_total', type: 'radio', options: ['vs','s','o','u','vu'] },
+                { id: 'rec', type: 'radio', options: ['y','n'] }
+            ];
         }
 
-        qList.forEach((q, i) => {
-            const html = `
+        qList.forEach((q, idx) => {
+            const card = `
                 <div class="bg-white p-6 question-card shadow-sm border border-gray-100">
                     <p class="font-black text-gray-800 mb-4 text-base leading-snug">
-                        <span class="text-blue-500 mr-1">${i+1}.</span> <span data-i18n="${q.labelKey || q.id}">...</span>
+                        <span class="text-blue-500 mr-1">${idx + 1}.</span> <span data-i18n="${q.id}">---</span>
                     </p>
                     <div class="grid grid-cols-1 gap-2.5">
                         ${q.options.map(opt => `
                             <label class="flex items-center p-4 border rounded-2xl border-gray-100 bg-gray-50/50 active:bg-blue-50 transition cursor-pointer">
                                 <input type="${q.type}" name="${q.id}" value="${opt}" class="w-5 h-5 mr-3 text-blue-600" ${q.type==='radio'?'required':''}> 
-                                <span class="text-slate-600 text-sm font-bold" data-i18n="${opt}">...</span>
-                            </label>
-                        `).join('')}
+                                <span class="text-slate-600 text-sm font-bold" data-i18n="${opt}">---</span>
+                            </label>`).join('')}
                     </div>
-                </div>
-            `;
-            container.insertAdjacentHTML('beforeend', html);
+                </div>`;
+            container.insertAdjacentHTML('beforeend', card);
         });
     }
 
+    // --- STREAMING_CHUNK:Handling language change and data translations... ---
     window.changeLang = function(lang) {
-        activeLang = lang;
+        currentLang = lang;
         document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
         document.getElementById(`btn-${lang}`).classList.add('active');
         const d = dicts[lang] || dicts['zh'];
-        
-        const isSpecial = (activeSid === 'SID-PS-8892' || activeSid === 'SID-JS-3310');
-        
+
         document.querySelectorAll('[data-i18n]').forEach(el => {
             const k = el.getAttribute('data-i18n');
-            let text = d[k] || dicts['zh'][k] || k;
-            
-            // 特殊店面加上必填星號
-            if (isSpecial) {
-                if (k === 'custNameLabel' || k === 'phoneLabel') text += ' *';
-            }
-            el.innerHTML = text;
+            if (d[k]) el.innerHTML = d[k];
+            else if (dicts['zh'][k]) el.innerHTML = dicts['zh'][k];
         });
 
         document.querySelectorAll('[data-ph]').forEach(el => {
             const k = el.getAttribute('data-ph');
             if (d[k]) el.placeholder = d[k];
         });
+
+        const isSpec = (activeSid === 'SID-PS-8892' || activeSid === 'SID-JS-3310');
+        document.getElementById('labelCustName').innerHTML = d['custNameLabel'] + (isSpec ? ' *' : '');
+        document.getElementById('labelCustPhone').innerHTML = d['phoneLabel'] + (isSpec ? ' *' : '');
     };
 
+    // --- STREAMING_CHUNK:Processing form submission and Firebase storage... ---
     document.getElementById('surveyForm').addEventListener('submit', async (e) => {
         e.preventDefault();
         const btn = document.getElementById('submitBtn');
         btn.disabled = true;
         btn.innerText = "Processing...";
 
-        const payload = {
+        const results = {
             sid: activeSid,
             store: STORE_MAP[activeSid].name,
-            customer: document.getElementById('custName').value || "Anonymous",
-            phone: document.getElementById('custPhone').value || "N/A",
-            suggestions: document.getElementById('suggestions').value,
             masseurId: document.getElementById('masseurId').value || "N/A",
-            lang: activeLang,
+            customerName: document.getElementById('custName').value,
+            customerPhone: document.getElementById('custPhone').value,
+            suggestions: document.getElementById('suggestions').value,
+            lang: currentLang,
             data: {},
             timestamp: serverTimestamp()
         };
 
-        // 收集題目結果
         document.querySelectorAll('#dynamicQuestions .question-card').forEach(card => {
-            const inputs = card.querySelectorAll('input');
-            if (inputs.length > 0) {
-                const name = inputs[0].name;
-                const type = inputs[0].type;
-                if (type === 'checkbox') {
-                    payload.data[name] = Array.from(document.querySelectorAll(`input[name="${name}"]:checked`)).map(i => i.value);
-                } else {
-                    const sel = document.querySelector(`input[name="${name}"]:checked`);
-                    payload.data[name] = sel ? sel.value : null;
-                }
+            const input = card.querySelector('input');
+            const name = input.name;
+            if (input.type === 'checkbox') {
+                results.data[name] = Array.from(document.querySelectorAll(`input[name="${name}"]:checked`)).map(i => i.value);
+            } else {
+                const sel = document.querySelector(`input[name="${name}"]:checked`);
+                results.data[name] = sel ? sel.value : null;
             }
         });
 
         try {
-            /* 
-               根據您的 Rule: match /apps/zhongqing-v1/surveys/{document=**}
-               路徑對應為 collection(db, 'apps', 'zhongqing-v1', 'surveys')
-            */
-            const surveysRef = collection(db, 'apps', 'zhongqing-v1', 'surveys');
-            await addDoc(surveysRef, payload);
-            
-            // 紀錄分析
-            logEvent(analytics, 'survey_submitted', {
-                store_id: activeSid,
-                store_name: STORE_MAP[activeSid].name,
-                language: activeLang
-            });
-
+            // 注意：路徑為 apps -> zhongqing-v1 -> stores -> sid -> submissions
+            await addDoc(collection(db, 'apps', 'zhongqing-v1', 'stores', activeSid, 'submissions'), results);
+            logEvent(analytics, 'survey_submitted', { store: results.store });
             document.getElementById('successModal').classList.replace('modal-hide', 'modal-show');
             window.scrollTo({ top: 0, behavior: 'smooth' });
         } catch (err) {
@@ -405,33 +376,34 @@
             document.getElementById('errorModal').classList.replace('modal-hide', 'modal-show');
         } finally {
             btn.disabled = false;
-            btn.innerText = (dicts[activeLang] || dicts['zh']).submitBtn;
+            btn.innerText = dicts[currentLang].submitBtn;
         }
     });
 
     window.handleMarketing = (act) => {
-        if (act === 'Reviewed') {
-            const storeUrl = STORE_MAP[activeSid]?.google || 'https://maps.app.goo.gl/1Rto7b5TRNNF35yf8';
-            window.open(storeUrl, '_blank');
-        }
-        closeModal('successModal');
+        if (act === 'Reviewed') window.open(STORE_MAP[activeSid].google, '_blank');
+        document.getElementById('successModal').classList.replace('modal-show', 'modal-hide');
     };
 
-    window.closeModal = (id) => {
-        document.getElementById(id).classList.replace('modal-show', 'modal-hide');
-    };
-
+    // --- STREAMING_CHUNK:Managing Auth status and startup... ---
     onAuthStateChanged(auth, (user) => {
         if (user) {
             document.getElementById('submitBtn').disabled = false;
             document.getElementById('submitBtn').classList.remove('opacity-50');
-            document.getElementById('conn-status').innerText = "Security Verified - Ready to Submit";
-        } else {
-            document.getElementById('conn-status').innerText = "Authenticating Session...";
+            document.getElementById('conn-status').innerText = "SECURE CLOUD READY";
         }
     });
 
-    window.onload = () => { init(); signInAnonymously(auth); };
+    window.onload = async () => { 
+        init(); 
+        try {
+            await signInAnonymously(auth);
+        } catch(e) {
+            console.error("Auth Failed", e);
+            // 如果驗證失敗，直接彈出維修視窗
+            document.getElementById('errorModal').classList.replace('modal-hide', 'modal-show');
+        }
+    };
 </script>
 </body>
 </html>
