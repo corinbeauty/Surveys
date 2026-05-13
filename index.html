@@ -42,7 +42,6 @@
 
     <main class="px-4 space-y-4">
         <form id="surveyForm" class="space-y-4">
-            <!-- 門市顯示區 -->
             <div class="bg-white p-6 rounded-3xl border border-blue-100 shadow-sm">
                 <label class="block text-[10px] font-bold text-blue-400 mb-1 uppercase tracking-tighter" data-i18n="branchLabel">服務分店</label>
                 <div class="flex items-center text-gray-800 font-black text-xl italic">📍 <span id="storeNameText">---</span></div>
@@ -51,7 +50,6 @@
             <!-- 動態題目區 -->
             <div id="dynamicQuestions" class="space-y-4"></div>
 
-            <!-- 貴賓資料區 -->
             <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm space-y-5">
                 <h3 class="text-xs font-black text-blue-600 uppercase tracking-widest border-b pb-2 mb-2" data-i18n="guestInfo">貴賓資料 Information</h3>
                 
@@ -82,7 +80,6 @@
         </form>
     </main>
 
-    <!-- 成功彈窗 -->
     <div id="successModal" class="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-slate-900/80 backdrop-blur-md modal-hide">
         <div class="bg-white w-full max-w-sm rounded-[2.5rem] overflow-hidden shadow-2xl text-center border-b-8 border-amber-400">
             <div class="bg-blue-600 py-10 text-white">
@@ -105,7 +102,6 @@
         </div>
     </div>
 
-    <!-- 錯誤彈窗 (美化版) -->
     <div id="errorModal" class="fixed inset-0 z-[150] flex items-center justify-center p-6 bg-slate-900/80 backdrop-blur-md modal-hide">
         <div class="bg-white w-full max-w-sm rounded-[2.5rem] overflow-hidden shadow-2xl text-center border-b-8 border-red-500">
             <div class="bg-slate-800 py-10 text-white">
@@ -117,7 +113,7 @@
                 <h3 class="text-2xl font-black italic" data-i18n="errorModalTitle">系統維護中</h3>
             </div>
             <div class="p-8 space-y-6">
-                <p class="text-gray-600 font-bold text-sm leading-relaxed" data-i18n="errorModalText">目前伺服器連線繁忙或正在維護，請稍後再試，或告知現場服務人員。</p>
+                <p class="text-gray-600 font-bold text-sm leading-relaxed" data-i18n="errorModalText">目前伺服器連線繁忙或正在維護，請稍後再試。</p>
                 <button onclick="closeModal('errorModal')" class="bg-slate-800 text-white block w-full font-black py-4 rounded-2xl shadow-lg text-lg" data-i18n="errorModalBtn">我知道了</button>
             </div>
         </div>
@@ -191,16 +187,46 @@
             title: "Service Survey", branchLabel: "Branch", guestInfo: "Guest Information", masseurIdLabel: "Staff ID *", custNameLabel: "Name", phoneLabel: "Phone", suggestLabel: "Feedback", submitBtn: "Submit Survey", ph_masseur: "ID", ph_name: "Name", ph_phone: "Phone", ph_suggest: "Your suggestions...", modalTitle: "Thank You!", modalText: "We value your support.", modalGoGoogle: "Review Now", modalClose: "Later",
             errorModalTitle: "Under Maintenance", errorModalText: "The server is currently busy or under maintenance. Please try again later.", errorModalBtn: "Got it",
             y: "Yes", n: "No", vs: "Excellent", s: "Good", o: "Fair", u: "Poor", vu: "Bad",
-            age: "Your Age", age1: "Under 20", age2: "21-30", age3: "31-40", age4: "41-50", age5: "Above 51"
+            age: "Your Age", age1: "Under 20", age2: "21-30", age3: "31-40", age4: "41-50", age5: "Above 51",
+            src: "How did you hear about us?", src1: "Online Ads", src2: "SNS", src3: "Friends", src4: "Poster", src5: "Brand", src6: "Passing by",
+            svc: "Service (Multiple)", svc1: "Facial-Hydra", svc2: "Facial-Bubble", svc3: "Oil Massage", svc4: "Hot Stone", svc5: "Body Scrub", svc6: "Ear Candle", svc9: "Scalp Care", svc15: "Stone Bed", svc16: "SPA",
+            sat_svc: "Service Satisfaction", sat_book: "Booking Flow", sat_env: "Environment", sat_intro: "Front Desk Intro", sat_att: "Staff Attitude", sat_pro: "Professionalism", sat_relax: "Relaxation", sat_total: "Overall Sat.",
+            rec: "Recommend to friends", rev: "Revisit in future", frm: "Where from", f_n: "North", f_c: "Central", f_s: "South", f_e: "East",
+            rm: "Room Type", rm1: "Single Bed", rm2: "Deluxe Single", rm3: "Private Rm", rm4: "Double Rm", rm5: "Four-bed Rm",
+            q1: "ID Intro at start?", q1_1: "Proactive", q1_2: "Later", q1_3: "None",
+            q2: "Pressure check?", q2_1: "Proactive", q2_2: "Passive", q2_3: "None",
+            q3: "Unpleasant odor?", q3_1: "None", q3_2: "A little", q3_3: "Strong",
+            q10: "Would you re-book?", q10_1: "Definitely", q10_2: "Maybe", q10_3: "Never"
         },
         ja: {
-            title: "お客様満足度調査", branchLabel: "店舗", guestInfo: "お客様情報", masseurIdLabel: "スタッフ番号 *", custNameLabel: "お名前", phoneLabel: "お電話", suggestLabel: "ご意見", submitBtn: "アンケート送信", ph_masseur: "番号", ph_name: "お名前", ph_phone: "お電話", ph_suggest: "ご意見...", modalTitle: "ありがとうございます", modalText: "皆様のご意見が勵みになります。", modalGoGoogle: "レビューを書く", modalClose: "また今度",
+            title: "お客様満足度調査", branchLabel: "店舗", guestInfo: "お客様情報", masseurIdLabel: "スタッフ番号 *", custNameLabel: "お名前", phoneLabel: "お電話", suggestLabel: "ご意見", submitBtn: "アンケート送信", ph_masseur: "番号", ph_name: "お名前", ph_phone: "お電話", ph_suggest: "ご意見...", modalTitle: "ありがとうございます", modalText: "皆様のご意見が励みになります。", modalGoGoogle: "レビューを書く", modalClose: "また今度",
             errorModalTitle: "システムメンテナンス中", errorModalText: "サーバーが混雑しているか、メンテナンス中です。しばらくしてからもう一度お試しください。", errorModalBtn: "了解",
-            y: "はい", n: "いいえ", vs: "大変満足", s: "満足", o: "普通", u: "不満", vu: "非常に不滿"
+            y: "はい", n: "いいえ", vs: "大変満足", s: "満足", o: "普通", u: "不満", vu: "非常に不満",
+            age: "年齢", age1: "20歳以下", age2: "21-30歳", age3: "31-40歳", age4: "41-50歳", age5: "51歳以上",
+            src: "どこで知りましたか？", src1: "ネット広告", src2: "SNS", src3: "友人紹介", src4: "ポスター", src5: "ブランド", src6: "通りがかり",
+            svc: "体験コース (複数可)", svc1: "フェイシャル保湿", svc2: "フェイシャル小気泡", svc3: "アロマオイル", svc4: "ホットストーン", svc5: "ボディスクラブ", svc6: "イヤーキャンドル", svc9: "頭皮ケア", svc15: "岩盤浴", svc16: "SPA",
+            sat_svc: "施術満足度", sat_book: "予約の流れ", sat_env: "環境の快適さ", sat_intro: "受付の説明", sat_att: "スタッフの態度", sat_pro: "専門性", sat_relax: "リラックス感", sat_total: "全体満足度",
+            rec: "推薦したいですか？", rev: "再来店したいですか？", frm: "どちらからお越しですか？", f_n: "北部", f_c: "中部", f_s: "南部", f_e: "東部",
+            rm: "お部屋タイプ", rm1: "シングルベッド", rm2: "デラックスシングル", rm3: "個室", rm4: "ダブルルーム", rm5: "フォースルーム",
+            q1: "番号紹介はありましたか？", q1_1: "積極的", q1_2: "後で", q1_3: "なし",
+            q2: "力加減の確認は？", q2_1: "積極的", q2_2: "受動的", q2_3: "なし",
+            q3: "不快な臭いは？", q3_1: "なし", q3_2: "少し気になる", q3_3: "非常に気になる",
+            q10: "次回も指名しますか？", q10_1: "必ず指名", q10_2: "検討中", q10_3: "しない"
         },
         ko: {
             title: "서비스 만족도 설문", branchLabel: "지점", guestInfo: "고객 정보", masseurIdLabel: "관리사 번호 *", custNameLabel: "성함", phoneLabel: "연락처", suggestLabel: "의견", submitBtn: "설문 제출", ph_masseur: "번호", ph_name: "성함", ph_phone: "연락처", ph_suggest: "의견을 남겨주세요...", modalTitle: "감사합니다", modalText: "고객님의 의견이 큰 힘이 됩니다。", modalGoGoogle: "리뷰 남기기", modalClose: "닫기",
-            errorModalTitle: "계통 점검 중", errorModalText: "현재 서버가 혼잡하거나 점검 중입니다. 잠시 후 다시 시도해 주세요。", errorModalBtn: "확인"
+            errorModalTitle: "계통 점검 중", errorModalText: "현재 서버가 혼잡하거나 점검 중입니다. 잠시 후 다시 시도해 주세요。", errorModalBtn: "확인",
+            y: "예", n: "아니오", vs: "매우 만족", s: "만족", o: "보통", u: "불만족", vu: "매우 불만족",
+            age: "연령대", age1: "20세 이하", age2: "21-30세", age3: "31-40세", age4: "41-50세", age5: "51세 이상",
+            src: "어떻게 알고 오셨나요?", src1: "인터넷 광고", src2: "SNS", src3: "지인 추천", src4: "포스터", src5: "브랜드 소개", src6: "방문",
+            svc: "체험 항목 (중복 선택 가능)", svc1: "페이셜 보습", svc2: "페이셜 버블", svc3: "아로마 오일", svc4: "핫스톤", svc5: "바디 스크럽", svc6: "이어 캔들", svc9: "두피 케어", svc15: "암반욕", svc16: "SPA",
+            sat_svc: "시설/시술 만족도", sat_book: "예약 만족도", sat_env: "환경 만족도", sat_intro: "직원 안내", sat_att: "관리사 태도", sat_pro: "전문성", sat_relax: "편안함", sat_total: "종합 만족도",
+            rec: "추천 의향", rev: "재방문 의향", frm: "방문 지역", f_n: "북부", f_c: "중부", f_s: "남부", f_e: "동부",
+            rm: "객실 타입", rm1: "싱글 베드", rm2: "디럭스 싱글", rm3: "개인실", rm4: "더블룸", rm5: "포베드룸",
+            q1: "번호 안내가 있었나요?", q1_1: "적극 안내", q1_2: "나중에", q1_3: "없음",
+            q2: "압력 확인이 있었나요?", q2_1: "적극 확인", q2_2: "수동적", q2_3: "없음",
+            q3: "불쾌한 냄새가 있었나요?", q3_1: "전혀 없음", q3_2: "약간 있음", q3_3: "심함",
+            q10: "다시 지명하시겠습니까?", q10_1: "꼭 지명", q10_2: "생각 중", q10_3: "안 함"
         }
     };
 
@@ -353,7 +379,6 @@
         });
 
         try {
-            // 注意：這裡根據您的需求，將路徑改為 stores/SID-XXXX/submissions
             const submissionsRef = collection(db, 'apps', 'zhongqing-v1', 'stores', activeSid, 'submissions');
             await addDoc(submissionsRef, payload);
             
@@ -367,7 +392,6 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         } catch (err) {
             console.error("Firebase Submission Error:", err);
-            // 觸發美化版錯誤彈窗
             document.getElementById('errorModal').classList.replace('modal-hide', 'modal-show');
         } finally {
             btn.disabled = false;
