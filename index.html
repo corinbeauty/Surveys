@@ -22,7 +22,6 @@
     <div class="text-7xl mb-6">🚫</div>
     <h2 class="text-2xl font-black text-slate-800 mb-2">連結已失效或不正確</h2>
     <p class="text-slate-500">請確認您掃描的是門市現場正確的 QR Code</p>
-    <p class="text-[10px] text-slate-300 mt-4 uppercase font-mono">Error Code: INVALID_SID_OR_STORE_KEY</p>
 </div>
 
 <div id="app" class="max-w-md mx-auto">
@@ -123,15 +122,12 @@
     const translations = {
         zh: {
             title: "服務意見調查表", branchLabel: "服務分店 BRANCH", guestInfo: "貴賓資料 INFORMATION", masseurIdLabel: "師傅號碼 *", custNameLabel: "貴賓姓名 *", phoneLabel: "聯絡電話 *", suggestLabel: "建議內容詳述", submitBtn: "提交問卷 Submit", ph_masseur: "輸入編號", ph_name: "輸入姓名", ph_phone: "輸入電話", ph_suggest: "您的寶貴建議...", modalTitle: "感謝您的回饋！", modalText: "您的支持是我們進步的動力。", modalGoGoogle: "馬上評論", modalClose: "下次再評",
-            // 共通選項
             opt_y: "是", opt_n: "否", opt_vsat: "非常滿意", opt_sat: "滿意", opt_ok: "還好", opt_unsat: "不滿意", opt_vunsat: "非常不滿意",
-            // 特殊題型
             t_age: "您的年齡", age_1: "20歲以下", age_2: "21-30歲", age_3: "31-40歲", age_4: "41-50歲", age_5: "51歲以上",
             t_first: "是否第一次來？", t_from: "從哪裡來訪？", from_n: "北部", from_c: "中部", from_s: "南部", from_e: "東部",
             t_source: "得知管道", src_1: "網路廣告", src_2: "粉絲專頁", src_3: "親友介紹", src_4: "實體海報", src_5: "品牌介紹", src_6: "路過",
             t_room: "入住項目", rm_1: "單人床", rm_2: "豪華單人", rm_3: "單人房", rm_4: "雙人房", rm_5: "四人房",
             sat_svc: "療程滿意度", sat_rm: "房間滿意度", sat_spa: "設施舒適度", sat_booking: "預約流程", sat_env: "環境舒適度", sat_intro: "櫃台介紹", sat_attitude: "美容師態度", sat_pro: "專業度", sat_relax: "放鬆感", sat_total: "整體滿意度", t_recommend: "是否願意推薦", t_revisit: "是否願意再次光臨",
-            // 標準 10 題
             zq1: "1. 有介紹號碼詢問項目嗎？", zq1_1: "主動介紹", zq1_2: "後來才問", zq1_3: "完全沒問",
             zq2: "2. 有主動詢問力道嗎？", zq2_1: "主動詢問", zq2_2: "被動回應", zq2_3: "完全不問",
             zq3: "3. 師傅有異味或煙味嗎？", zq3_1: "沒有異味", zq3_2: "稍微有點", zq3_3: "味道很重",
@@ -148,22 +144,58 @@
             opt_y: "Yes", opt_n: "No", opt_vsat: "Very Satisfied", opt_sat: "Satisfied", opt_ok: "Fair", opt_unsat: "Unsatisfied", opt_vunsat: "Poor",
             t_age: "Your Age", age_1: "Under 20", age_2: "21-30", age_3: "31-40", age_4: "41-50", age_5: "Over 51",
             t_first: "First time?", t_from: "From?", from_n: "North", from_c: "Central", from_s: "South", from_e: "East",
-            t_source: "Where did you hear?", src_1: "Ads", src_2: "Social", src_3: "Friends", src_4: "Poster", src_5: "Brand", src_6: "Passed",
+            t_source: "Channel", src_1: "Ads", src_2: "Social", src_3: "Friends", src_4: "Poster", src_5: "Brand", src_6: "Passed",
             t_room: "Room Type", rm_1: "Single", rm_2: "Deluxe Single", rm_3: "Single Room", rm_4: "Double", rm_5: "Quad",
             sat_svc: "Service Satisfied", sat_rm: "Room Satisfied", sat_spa: "SPA Satisfied", sat_booking: "Booking Flow", sat_env: "Environment", sat_intro: "Front Desk", sat_attitude: "Attitude", sat_pro: "Professional", sat_relax: "Relaxation", sat_total: "Overall", t_recommend: "Recommend?", t_revisit: "Re-visit?",
-            zq1: "1. ID Intro at start?", zq1_1: "Active", zq1_2: "Late", zq1_3: "No",
-            zq2: "2. Pressure check?", zq2_1: "Active", zq2_2: "Passive", zq2_3: "No",
-            zq3: "3. Unpleasant odor?", zq3_1: "No", zq3_2: "Slight", zq3_3: "Strong",
-            zq4: "4. Timing management?", zq4_1: "Good", zq4_2: "Fair", zq4_3: "Poor",
-            zq5: "5. Politeness?", zq5_1: "Good", zq5_2: "Fair", zq5_3: "Rude",
-            zq6: "6. Awkward touch?", zq6_1: "Professional", zq6_2: "Awkward", zq6_3: "Bad",
-            zq7: "7. Dangerous moves?", zq7_1: "None", zq7_2: "Risky", zq7_3: "Bad",
-            zq8: "8. Check-in offer?", zq8_1: "Active", zq8_2: "Passive", zq8_3: "None",
-            zq9: "9. Card offered?", zq9_1: "Active", zq9_2: "Requested", zq9_3: "None",
-            zq10: "10. Re-book same therapist?", zq10_1: "Definitely", zq10_2: "Maybe", zq10_3: "Never"
+            zq1: "1. ID Intro?", zq1_1: "Active", zq1_2: "Late", zq1_3: "No",
+            zq2: "2. Pressure?", zq2_1: "Active", zq2_2: "Passive", zq2_3: "No",
+            zq3: "3. Odor?", zq3_1: "No", zq3_2: "Slight", zq3_3: "Strong",
+            zq4: "4. Timing?", zq4_1: "Good", zq4_2: "Fair", zq4_3: "Poor",
+            zq5: "5. Manners?", zq5_1: "Good", zq5_2: "Fair", zq5_3: "Rude",
+            zq6: "6. Touching?", zq6_1: "Pro", zq6_2: "Awkward", zq6_3: "Bad",
+            zq7: "7. Danger?", zq7_1: "None", zq7_2: "Risky", zq7_3: "Bad",
+            zq8: "8. Check-in?", zq8_1: "Active", zq8_2: "Passive", zq8_3: "No",
+            zq9: "9. Card?", zq9_1: "Active", zq9_2: "Req", zq9_3: "No",
+            zq10: "10. Rebook?", zq10_1: "Yes", zq10_2: "Maybe", zq10_3: "No"
         },
-        ja: { title: "アンケート", branchLabel: "店舗", submitBtn: "送信", modalTitle: "ありがとうございます", opt_y: "はい", opt_n: "いいえ" },
-        ko: { title: "설문지", branchLabel: "지점", submitBtn: "제출", modalTitle: "감사합니다", opt_y: "예", opt_n: "아니오" }
+        ja: { 
+            title: "アンケート", branchLabel: "店舗 BRANCH", guestInfo: "情報 INFORMATION", masseurIdLabel: "スタッフ番号 *", custNameLabel: "お名前 *", phoneLabel: "電話番号 *", suggestLabel: "ご意見", submitBtn: "送信 Submit", ph_masseur: "番号入力", ph_name: "名前入力", ph_phone: "電話入力", ph_suggest: "ご意見...", modalTitle: "ありがとうございます！", modalText: "皆様のご意見を大切にします。", modalGoGoogle: "レビューを書く", modalClose: "閉じる",
+            opt_y: "はい", opt_n: "いいえ", opt_vsat: "非常に満足", opt_sat: "満足", opt_ok: "普通", opt_unsat: "不満", opt_vunsat: "非常に不満",
+            t_age: "年齢", age_1: "20歳以下", age_2: "21-30歳", age_3: "31-40歳", age_4: "41-50歳", age_5: "51歳以上",
+            t_first: "初めてですか？", t_from: "どちらから？", from_n: "北部", from_c: "中部", from_s: "南部", from_e: "東部",
+            t_source: "紹介チャンネル", src_1: "広告", src_2: "SNS", src_3: "紹介", src_4: "ポスター", src_5: "ブランド", src_6: "通りすがり",
+            t_room: "部屋タイプ", rm_1: "シングル", rm_2: "デラックス", rm_3: "個室", rm_4: "ダブル", rm_5: "クアッド",
+            sat_svc: "サービス満足度", sat_rm: "お部屋満足度", sat_spa: "施設満足度", sat_booking: "予約の流れ", sat_env: "環境の快適さ", sat_intro: "フロント案内", sat_attitude: "スタッフの態度", sat_pro: "専門性", sat_relax: "リラックス感", sat_total: "全体満足度", t_recommend: "推薦しますか", t_revisit: "再訪しますか",
+            zq1: "1. 番号紹介はありましたか？", zq1_1: "積極的", zq1_2: "後から", zq1_3: "なし",
+            zq2: "2. 力加減の確認は？", zq2_1: "積極的", zq2_2: "受動的", zq2_3: "なし",
+            zq3: "3. 臭いは気になりましたか？", zq3_1: "なし", zq3_2: "少し", zq3_3: "強い",
+            zq4: "4. 時間管理は適切？", zq4_1: "良い", zq4_2: "普通", zq4_3: "悪い",
+            zq5: "5. 言葉遣いは？", zq5_1: "丁寧", zq5_2: "普通", zq5_3: "不適切",
+            zq6: "6. 身体接触は適切？", zq6_1: "専門的", zq6_2: "気まずい", zq6_3: "悪い",
+            zq7: "7. 危険な動作は？", zq7_1: "なし", zq7_2: "少し", zq7_3: "危険",
+            zq8: "8. SNS紹介は？", zq8_1: "積極的", zq8_2: "受動的", zq8_3: "なし",
+            zq9: "9. 名刺はもらいましたか？", zq9_1: "積極的", zq9_2: "求めたら", zq9_3: "なし",
+            zq10: "10. 次回も指名しますか？", zq10_1: "必ず指名", zq10_2: "検討中", zq10_3: "しない"
+        },
+        ko: { 
+            title: "설문조사", branchLabel: "지점 BRANCH", guestInfo: "정보 INFORMATION", masseurIdLabel: "관리사 번호 *", custNameLabel: "성함 *", phoneLabel: "전화번호 *", suggestLabel: "의견", submitBtn: "제출 Submit", ph_masseur: "번호 입력", ph_name: "이름 입력", ph_phone: "전화 입력", ph_suggest: "소중한 의견...", modalTitle: "감사합니다!", modalText: "더 나은 서비스를 위해 노력하겠습니다.", modalGoGoogle: "리뷰 작성", modalClose: "닫기",
+            opt_y: "예", opt_n: "아니오", opt_vsat: "매우 만족", opt_sat: "만족", opt_ok: "보통", opt_unsat: "불만족", opt_vunsat: "매우 불만족",
+            t_age: "연령대", age_1: "20세 이하", age_2: "21-30세", age_3: "31-40세", age_4: "41-50세", age_5: "51세 이상",
+            t_first: "첫 방문입니까?", t_from: "거주 지역", from_n: "북부", from_c: "중부", from_s: "남부", from_e: "동부",
+            t_source: "인지 경로", src_1: "온라인 광고", src_2: "SNS", src_3: "지인 소개", src_4: "포스터", src_5: "브랜드 소개", src_6: "지나가는 길",
+            t_room: "이용 룸", rm_1: "싱글 베드", rm_2: "디럭스 싱글", rm_3: "싱글 룸", rm_4: "더블 룸", rm_5: "쿼드 룸",
+            sat_svc: "서비스 만족도", sat_rm: "객실 만족도", sat_spa: "시설 만족도", sat_booking: "예약 과정", sat_env: "환경 쾌적함", sat_intro: "프런트 안내", sat_attitude: "직원 태도", sat_pro: "전문성", sat_relax: "긴장 완화", sat_total: "전체 만족도", t_recommend: "추천 의향", t_revisit: "재방문 의향",
+            zq1: "1. 번호 및 항목 안내는?", zq1_1: "적극적", zq1_2: "나중에", zq1_3: "없음",
+            zq2: "2. 압력 세기 확인은?", zq2_1: "적극적", zq2_2: "수동적", zq2_3: "없음",
+            zq3: "3. 냄새가 불편했나요?", zq3_1: "없음", zq3_2: "약간", zq3_3: "심함",
+            zq4: "4. 시간 관리는?", zq4_1: "좋음", zq4_2: "보통", zq4_3: "나쁨",
+            zq5: "5. 언행은 정중했나요?", zq5_1: "친절함", zq5_2: "보통", zq5_3: "무례함",
+            zq6: "6. 신체 접촉은 적절했나요?", zq6_1: "전문적", zq6_2: "부자연스러움", zq6_3: "불편함",
+            zq7: "7. 위험한 동작이 있었나요?", zq7_1: "없음", zq7_2: "약간 위험", zq7_3: "위험함",
+            zq8: "8. 이벤트 안내는?", zq8_1: "적극적", zq8_2: "수동적", zq8_3: "없음",
+            zq9: "9. 명함을 받았나요?", zq9_1: "적극적", zq9_2: "요청시", zq9_3: "없음",
+            zq10: "10. 재지명 의사가 있나요?", zq10_1: "꼭 지명함", zq10_2: "생각중", zq10_3: "안함"
+        }
     };
 
     const STORE_CONFIGS = {
@@ -235,7 +267,7 @@
     function renderQuestions() {
         const container = document.getElementById('questionsContainer');
         container.innerHTML = '';
-        activeConfig.questions.forEach((q, idx) => {
+        activeConfig.questions.forEach((q) => {
             const html = `
                 <div class="bg-white p-6 question-card shadow-sm border border-gray-100">
                     <p class="font-bold text-slate-800 mb-4 text-base leading-snug">
@@ -262,14 +294,11 @@
 
         const dict = translations[lang] || translations['zh'];
         
-        // 批次處理所有具有 data-i18n 的標籤
         document.querySelectorAll('[data-i18n]').forEach(el => {
             const key = el.getAttribute('data-i18n');
-            // 如果字典有該 Key 就替換，否則退回中文字典
             el.innerHTML = dict[key] || translations['zh'][key] || key;
         });
 
-        // 批次處理 Placeholders
         document.querySelectorAll('[data-ph]').forEach(el => {
             const key = el.getAttribute('data-ph');
             el.placeholder = dict[key] || translations['zh'][key] || key;
