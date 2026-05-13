@@ -16,8 +16,6 @@
         #successModal, #errorModal { transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
         input:checked + span { color: #2563eb; font-weight: 900; }
         #errorOverlay { backdrop-filter: blur(12px); }
-        input[type="number"]::-webkit-inner-spin-button, 
-        input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
     </style>
 </head>
 <body class="bg-slate-50 min-h-screen pb-12">
@@ -100,12 +98,13 @@
                     <button id="marketingBtn" onclick="handleMarketing('Reviewed')" class="bg-amber-400 text-slate-900 block w-full font-black py-4 rounded-2xl shadow-lg text-lg flex items-center justify-center gap-2">
                         <span>⭐</span> <span data-i18n="modalGoGoogle">馬上評論</span>
                     </button>
-                    <button onclick="closeModal('successModal')" class="bg-slate-100 text-slate-400 block w-full font-bold py-3 rounded-2xl text-sm" data-i18n="modalClose">下次再評</button>
+                    <button onclick="handleMarketing('Dismissed')" class="bg-slate-100 text-slate-400 block w-full font-bold py-3 rounded-2xl text-sm" data-i18n="modalClose">下次再評</button>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- 錯誤彈窗 (美化版) -->
     <div id="errorModal" class="fixed inset-0 z-[150] flex items-center justify-center p-6 bg-slate-900/80 backdrop-blur-md modal-hide">
         <div class="bg-white w-full max-w-sm rounded-[2.5rem] overflow-hidden shadow-2xl text-center border-b-8 border-red-500">
             <div class="bg-slate-800 py-10 text-white">
@@ -145,6 +144,7 @@
     const db = getFirestore(app);
     const analytics = getAnalytics(app);
 
+    // --- 全門市配置 ---
     const STORE_MAP = {
         'SID-ZG-101': { name: '中港行館', type: 'standard', google: 'https://maps.app.goo.gl/1Rto7b5TRNNF35yf8' },
         'SID-YL-102': { name: '員林行館', type: 'standard', google: 'https://maps.app.goo.gl/1Rto7b5TRNNF35yf8' },
@@ -191,34 +191,16 @@
             title: "Service Survey", branchLabel: "Branch", guestInfo: "Guest Information", masseurIdLabel: "Staff ID *", custNameLabel: "Name", phoneLabel: "Phone", suggestLabel: "Feedback", submitBtn: "Submit Survey", ph_masseur: "ID", ph_name: "Name", ph_phone: "Phone", ph_suggest: "Your suggestions...", modalTitle: "Thank You!", modalText: "We value your support.", modalGoGoogle: "Review Now", modalClose: "Later",
             errorModalTitle: "Under Maintenance", errorModalText: "The server is currently busy or under maintenance. Please try again later.", errorModalBtn: "Got it",
             y: "Yes", n: "No", vs: "Excellent", s: "Good", o: "Fair", u: "Poor", vu: "Bad",
-            age: "Your Age", age1: "Under 20", age2: "21-30", age3: "31-40", age4: "41-50", age5: "Above 51",
-            src: "How did you hear about us?", src1: "Online Ad", src2: "FB/IG/Threads", src3: "Friends/Family", src4: "Poster", src5: "Brand Intro", src6: "Passing by",
-            svc: "Service Items (Multiple)", svc1: "Facial-Moisturizing", svc2: "Facial-Deep Clean", svc3: "Oil Massage", svc4: "Hot Stone", svc5: "Body Scrub", svc6: "Ear Candle", svc9: "Scalp Care", svc15: "Sauna", svc16: "SPA",
-            sat_svc: "Facility/Service Sat.", sat_book: "Booking Process", sat_env: "Environment Comf.", sat_intro: "Front Desk Intro", sat_att: "Staff Attitude", sat_pro: "Professionalism", sat_relax: "Relaxation", sat_total: "Overall Sat.",
-            rec: "Recommend to Others", rev: "Visit Again", frm: "Where are you from?", f_n: "North", f_c: "Central", f_s: "South", f_e: "East",
-            rm: "Room Type", rm1: "Single Bed", rm2: "Deluxe Single", rm3: "Single Room", rm4: "Double Room", rm5: "Quad Room"
+            age: "Your Age", age1: "Under 20", age2: "21-30", age3: "31-40", age4: "41-50", age5: "Above 51"
         },
         ja: {
             title: "お客様満足度調査", branchLabel: "店舗", guestInfo: "お客様情報", masseurIdLabel: "スタッフ番号 *", custNameLabel: "お名前", phoneLabel: "お電話", suggestLabel: "ご意見", submitBtn: "アンケート送信", ph_masseur: "番号", ph_name: "お名前", ph_phone: "お電話", ph_suggest: "ご意見...", modalTitle: "ありがとうございます", modalText: "皆様のご意見が勵みになります。", modalGoGoogle: "レビューを書く", modalClose: "また今度",
-            errorModalTitle: "システムメンテナンス中", errorModalText: "サーバーが混雑しているか、メンテナンス中です。しばらくしてからもう一度お試しください。", errorModalBtn: "了解",
-            y: "はい", n: "いいえ", vs: "大変満足", s: "満足", o: "普通", u: "不満", vu: "非常に不滿",
-            age: "年齢", age1: "20歳以下", age2: "21-30歳", age3: "31-40歳", age4: "41-50歳", age5: "51歳以上",
-            src: "どこで知りましたか？", src1: "ネット広告", src2: "SNS", src3: "知人の紹介", src4: "ポスター", src5: "ブランド紹介", src6: "通りがかり",
-            svc: "体験項目 (複数選択可)", svc1: "フェイシャル-保湿", svc2: "フェイシャル-洗浄", svc3: "アロママッサージ", svc4: "ホットストーン", svc5: "角質除去", svc6: "イヤーキャンドル", svc9: "頭皮ケア", svc15: "岩盤浴", svc16: "水療SPA",
-            sat_svc: "施設/施術の満足度", sat_book: "予約の流れ", sat_env: "環境の快適さ", sat_intro: "受付の説明", sat_att: "スタッフの態度", sat_pro: "専門性", sat_relax: "リラックス感", sat_total: "全体的な満足度",
-            rec: "知人に勧めたいですか", rev: "再来店したいですか", frm: "どちらから来ましたか", f_n: "北部", f_c: "中部", f_s: "南部", f_e: "東部",
-            rm: "お部屋のタイプ", rm1: "シングルベッド", rm2: "デラックスシングル", rm3: "シングルルーム", rm4: "ダブルルーム", rm5: "フォースルーム"
+            errorModalTitle: "システムメンテナンス中", errorModalText: "サーバーが混雜しているか、メンテナンス中です。しばらくしてからもう一度お試しください。", errorModalBtn: "了解",
+            y: "はい", n: "いいえ", vs: "大変満足", s: "満足", o: "普通", u: "不満", vu: "非常に不滿"
         },
         ko: {
             title: "서비스 만족도 설문", branchLabel: "지점", guestInfo: "고객 정보", masseurIdLabel: "관리사 번호 *", custNameLabel: "성함", phoneLabel: "연락처", suggestLabel: "의견", submitBtn: "설문 제출", ph_masseur: "번호", ph_name: "성함", ph_phone: "연락처", ph_suggest: "의견을 남겨주세요...", modalTitle: "감사합니다", modalText: "고객님의 의견이 큰 힘이 됩니다。", modalGoGoogle: "리뷰 남기기", modalClose: "닫기",
-            errorModalTitle: "시스템 점검 중", errorModalText: "현재 서버가 혼잡하거나 점검 중입니다. 잠시 후 다시 시도해 주세요.", errorModalBtn: "확인",
-            y: "예", n: "아니오", vs: "매우 만족", s: "만족", o: "보통", u: "불만족", vu: "매우 불만족",
-            age: "연령대", age1: "20세 이하", age2: "21-30세", age3: "31-40세", age4: "41-50세", age5: "51세 이상",
-            src: "어떻게 알고 오셨나요?", src1: "인터넷 광고", src2: "SNS", src3: "지인 추천", src4: "포스터", src5: "브랜드 소개", src6: "지나가다가",
-            svc: "체험 항목 (중복 선택 가능)", svc1: "훼이셜-보습", svc2: "훼이셜-딥클린", svc3: "아로마 마사지", svc4: "핫스톤", svc5: "각질 제거", svc6: "이어 캔들", svc9: "두피 케어", svc15: "암반욕", svc16: "스파",
-            sat_svc: "시설/시술 만족도", sat_book: "예약 프로세스", sat_env: "환경 쾌적함", sat_intro: "카운터 안내", sat_att: "직원 친절도", sat_pro: "전문성", sat_relax: "휴식감", sat_total: "종합 만족度",
-            rec: "지인 추천 의향", rev: "재방문 의향", frm: "어디서 오셨나요", f_n: "북부", f_c: "중부", f_s: "남부", f_e: "동부",
-            rm: "객실 타입", rm1: "싱글 ベ드", rm2: "디럭스 싱글", rm3: "싱글룸", rm4: "더블룸", rm5: "쿼드룸"
+            errorModalTitle: "系統 점검 중", errorModalText: "현재 서버가 혼잡하거나 점검 중입니다. 잠시 후 다시 시度해 주세요。", errorModalBtn: "확인"
         }
     };
 
@@ -371,10 +353,12 @@
         });
 
         try {
-            // Path MUST match your security rules: /apps/zhongqing-v1/surveys
-            await addDoc(collection(db, 'apps', 'zhongqing-v1', 'surveys'), payload);
+            // 注意：這裡根據您的需求，將路徑改為 stores/SID-XXXX/submissions
+            const submissionsRef = collection(db, 'apps', 'zhongqing-v1', 'stores', activeSid, 'submissions');
+            await addDoc(submissionsRef, payload);
             
             logEvent(analytics, 'survey_submitted', {
+                store_id: activeSid,
                 store_name: STORE_MAP[activeSid].name,
                 language: activeLang
             });
@@ -383,7 +367,7 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         } catch (err) {
             console.error("Firebase Submission Error:", err);
-            // Trigger Beautified Error Modal
+            // 觸發美化版錯誤彈窗
             document.getElementById('errorModal').classList.replace('modal-hide', 'modal-show');
         } finally {
             btn.disabled = false;
