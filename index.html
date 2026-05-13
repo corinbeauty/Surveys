@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>手舞足道集團 - 服務意見調查表</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap');
+        body { font-family: 'Noto Sans TC', sans-serif; -webkit-tap-highlight-color: transparent; }
+        .lang-btn { transition: all 0.3s ease; background-color: white; color: #4b5563; border: 1px solid #e5e7eb; }
+        .lang-btn.active { background-color: #2563eb !important; color: white !important; border-color: #1e40af !important; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3); }
+        .question-card { border-radius: 1.5rem; border: 1px solid #f3f4f6; transition: transform 0.2s; }
+        .modal-show { opacity: 1; pointer-events: auto; transform: scale(1); }
+        .modal-hide { opacity: 0; pointer-events: none; transform: scale(0.95); }
+        #successModal { transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+        #errorOverlay { backdrop-filter: blur(10px); }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen pb-12">
+
+<div id="errorOverlay" class="fixed inset-0 z-[200] bg-white/95 flex flex-col items-center justify-center p-10 text-center hidden">
+    <div class="text-7xl mb-6">🚫</div>
+    <h2 class="text-2xl font-black text-slate-800 mb-2">連結已失效或不正確</h2>
+    <p class="text-slate-500">請確認您掃描的是門市現場正確的 QR Code</p>
+    <div class="mt-8 text-[10px] text-slate-300 font-mono">ERROR_CODE: INVALID_SID_OR_STORE_KEY</div>
+</div>
+
+<div id="app" class="max-w-md mx-auto">
+    <header class="bg-white sticky top-0 z-20 shadow-sm px-4 py-4 mb-4 text-center border-b border-gray-100">
+        <h1 class="text-xl font-black text-slate-800 tracking-tight" data-i18n="title">服務意見調查表</h1>
+        <p id="conn-info" class="text-[8px] text-blue-500 font-mono tracking-widest uppercase italic font-bold">Authenticating Store Access...</p>
+        
+        <div class="flex justify-between gap-1 bg-gray-100 p-1 rounded-2xl border border-gray-200 mt-4">
+            <button onclick="window.changeLang('zh')" id="btn-zh" class="lang-btn active flex-1 py-2.5 rounded-xl text-xs font-bold">中文</button>
+            <button onclick="window.changeLang('en')" id="btn-en" class="lang-btn flex-1 py-2.5 rounded-xl text-xs font-bold">EN</button>
+            <button onclick="window.changeLang('ja')" id="btn-ja" class="lang-btn flex-1 py-2.5 rounded-xl text-xs font-bold">日本語</button>
+            <button onclick="window.changeLang('ko')" id="btn-ko" class="lang-btn flex-1 py-2.5 rounded-xl text-xs font-bold">한국어</button>
+        </div>
+    </header>
+
+    <main class="px-4 space-y-4">
+        <form id="surveyForm" class="space-y-4">
+            <div class="bg-white p-5 rounded-3xl border border-blue-100 shadow-sm flex items-center justify-between">
+                <div>
+                    <label class="block text-[10px] font-black text-blue-400 mb-1 uppercase tracking-tighter" data-i18n="branchLabel">服務分店 BRANCH</label>
+                    <div class="flex items-center text-gray-800 font-black text-xl italic">📍 <span id="storeDisplayName">---</span></div>
+                </div>
+                <div class="text-[10px] bg-slate-100 px-3 py-1.5 rounded-xl font-mono text-slate-400 font-bold" id="storeCodeTag">AUTH-ID</div>
+            </div>
+
+            <!-- 動態題目容器 -->
+            <div id="questionsContainer" class="space-y-4"></div>
+
+            <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm space-y-5">
+                <h3 class="text-xs font-black text-blue-600 uppercase tracking-widest border-b pb-2 mb-4" data-i18n="guestInfo">貴賓資料 INFORMATION</h3>
+                
+                <div>
+                    <label class="block text-xs font-bold text-gray-400 mb-2 uppercase" data-i18n="masseurIdLabel">師傅號碼 *</label>
+                    <input type="number" id="masseurId" required data-ph="ph_masseur" class="w-full p-4 bg-gray-50 border border-gray-200 rounded-2xl text-2xl font-black outline-none focus:ring-2 focus:ring-blue-500 placeholder:font-normal placeholder:text-gray-300">
+                </div>
+
+                <div class="grid grid-cols-1 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 mb-2 uppercase" data-i18n="custNameLabel">貴賓姓名 *</label>
+                        <input type="text" id="custName" required data-ph="ph_name" class="w-full p-4 bg-gray-50 border border-gray-200 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 mb-2 uppercase" data-i18n="phoneLabel">聯絡電話 *</label>
+                        <input type="tel" id="custPhone" required data-ph="ph_phone" class="w-full p-4 bg-gray-50 border border-gray-200 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-400 mb-2 uppercase" data-i18n="suggestLabel">建議內容詳述</label>
+                    <textarea id="suggestions" rows="3" data-ph="ph_suggest" class="w-full p-4 bg-gray-50 border border-gray-200 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                </div>
+            </div>
+
+            <button type="submit" id="submitBtn" disabled class="w-full bg-blue-600 text-white font-black py-5 rounded-3xl shadow-lg active:scale-95 transition-all text-lg opacity-50">
+                <span data-i18n="submitBtn">提交問卷 Submit</span>
+            </button>
+        </form>
+    </main>
+
+    <div id="successModal" class="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-slate-900/80 backdrop-blur-md modal-hide">
+        <div class="bg-white w-full max-w-sm rounded-[2.5rem] overflow-hidden shadow-2xl text-center border-b-8 border-amber-400">
+            <div class="bg-blue-600 py-10 text-white">
+                <div class="mb-4 flex justify-center">
+                    <div class="w-20 h-20 bg-white rounded-full flex items-center justify-center p-2 shadow-lg">
+                        <img src="https://cdn-icons-png.flaticon.com/512/1160/1160358.png" alt="Success" class="w-full h-full object-contain">
+                    </div>
+                </div>
+                <h3 class="text-2xl font-black italic" data-i18n="modalTitle">感謝您的回饋！</h3>
+            </div>
+            <div class="p-8 space-y-6">
+                <p id="modalText" class="text-gray-600 font-bold text-sm leading-relaxed" data-i18n="modalText">我們已收到您的意見。</p>
+                <div class="space-y-3">
+                    <button id="googleReviewBtn" onclick="handleAction('Reviewed')" class="bg-amber-400 text-slate-900 block w-full font-black py-4 rounded-2xl shadow-lg text-lg">
+                        ⭐ <span data-i18n="modalGoGoogle">Google 評論</span>
+                    </button>
+                    <button onclick="handleAction('Dismissed')" class="bg-slate-100 text-slate-400 block w-full font-bold py-3 rounded-2xl text-sm" data-i18n="modalClose">下次再評</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyCuytMbR0wfPk0vChxqI66Zci0uJtGiizE",
+        authDomain: "survey-c3aa5.firebaseapp.com",
+        projectId: "survey-c3aa5",
+        storageBucket: "survey-c3aa5.firebasestorage.app",
+        messagingSenderId: "874594469122",
+        appId: "1:874594469122:web:2b2c1208b20d2095b9ae1b"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const STORE_KEY_MAP = {
+        'SID-ZG-101': '中港行館', 'SID-YL-102': '員林行館', 'SID-ZQ-103': '中清行館',
+        'SID-DL-104': '大里行館', 'SID-ZK-105': '中科行館', 'SID-SL-106': '沙鹿行館',
+        'SID-AH-107': '愛河行館', 'SID-FS-108': '鳳山行館', 'SID-ZY-109': '左營行館',
+        'SID-SD-110': '三多行館', 'SID-MS-111': '美術館行館', 'SID-FQ-112': '府前行館',
+        'SID-AP-113': '安平行館', 'SID-XS-114': '新生行館', 'SID-XY-115': '信義行館',
+        'SID-ZL-116': '中壢行館', 'SID-ZB-117': '竹北行館', 'SID-TP-118': '太平店',
+        'SID-FY-119': '豐原行館', 'SID-DX-120': '東興店', 'SID-WQ-121': '五權店'
+    };
+
+    const translations = {
+        zh: {
+            title: "服務意見調查表", branchLabel: "服務分店 BRANCH", guestInfo: "貴賓資料 INFORMATION", masseurIdLabel: "師傅號碼 *", custNameLabel: "貴賓姓名 *", phoneLabel: "聯絡電話 *", suggestLabel: "建議內容詳述", submitBtn: "提交問卷 Submit", ph_masseur: "輸入編號", ph_name: "輸入姓名", ph_phone: "輸入電話", ph_suggest: "您的寶貴建議...", modalTitle: "感謝您的回饋！", modalText: "您的支持是我們進步的動力。", modalGoGoogle: "馬上評論", modalClose: "下次再評",
+            zq1: "1. 有介紹號碼詢問項目嗎？", zq1_1: "主動介紹", zq1_2: "後來才問", zq1_3: "完全沒問",
+            zq2: "2. 有主動詢問力道嗎？", zq2_1: "主動詢問", zq2_2: "被動回應", zq2_3: "完全不問",
+            zq3: "3. 師傅有異味或煙味嗎？", zq3_1: "沒有異味", zq3_2: "稍微有點", zq3_3: "味道很重",
+            zq4: "4. 時間掌握得當嗎？", zq4_1: "很好", zq4_2: "普通", zq4_3: "很差",
+            zq5: "5. 言語是否有不禮貌？", zq5_1: "良好有禮", zq5_2: "普通尚可", zq5_3: "言語不當",
+            zq6: "6. 肢體觸碰讓你尷尬嗎？", zq6_1: "專業得體", zq6_2: "有點尷尬", zq6_3: "感覺很差",
+            zq7: "7. 有開椎甩頭等危險動作？", zq7_1: "完全沒有", zq7_2: "有點危險", zq7_3: "非常危險",
+            zq8: "8. 有邀請打卡按讚嗎？", zq8_1: "熱情主動", zq8_2: "非常被動", zq8_3: "完全沒說",
+            zq9: "9. 有主動給名片嗎？", zq9_1: "熱情主動", zq9_2: "要了才給", zq9_3: "沒有給",
+            zq10: "10. 下次還會再老點嗎？", zq10_1: "一定老點", zq10_2: "再試試看", zq10_3: "絕對不會"
+        },
+        en: { title: "Service Survey", branchLabel: "Store Branch", guestInfo: "Guest Information", masseurIdLabel: "Staff ID *", custNameLabel: "Name *", phoneLabel: "Phone *", suggestLabel: "Feedback", submitBtn: "Submit", ph_masseur: "ID", ph_name: "Name", ph_phone: "Phone", ph_suggest: "Feedback...", modalTitle: "Thank You!", modalText: "We value your support.", modalGoGoogle: "Review Now", modalClose: "Later" },
+        ja: { title: "顧客満足度調査", branchLabel: "店舗", submitBtn: "送信", guestInfo: "ゲスト情報" },
+        ko: { title: "서비스 만족도 조사", branchLabel: "지점", submitBtn: "제출", guestInfo: "고객 정보" }
+    };
+
+    const standardQuestions = [
+        { id: 'zq1', options: ['zq1_1', 'zq1_2', 'zq1_3'] },
+        { id: 'zq2', options: ['zq2_1', 'zq2_2', 'zq2_3'] },
+        { id: 'zq3', options: ['zq3_1', 'zq3_2', 'zq3_3'] },
+        { id: 'zq4', options: ['zq4_1', 'zq4_2', 'zq4_3'] },
+        { id: 'zq5', options: ['zq5_1', 'zq5_2', 'zq5_3'] },
+        { id: 'zq6', options: ['zq6_1', 'zq6_2', 'zq6_3'] },
+        { id: 'zq7', options: ['zq7_1', 'zq7_2', 'zq7_3'] },
+        { id: 'zq8', options: ['zq8_1', 'zq8_2', 'zq8_3'] },
+        { id: 'zq9', options: ['zq9_1', 'zq9_2', 'zq9_3'] },
+        { id: 'zq10', options: ['zq10_1', 'zq10_2', 'zq10_3'] }
+    ];
+
+    let currentLang = 'zh';
+
+    function init() {
+        const sid = new URLSearchParams(window.location.search).get('sid');
+        const storeName = STORE_KEY_MAP[sid];
+
+        if (!storeName) {
+            document.getElementById('errorOverlay').classList.remove('hidden');
+            return;
+        }
+
+        document.getElementById('storeDisplayName').innerText = storeName;
+        document.getElementById('storeCodeTag').innerText = sid;
+        renderQuestions();
+        window.changeLang('zh');
+    }
+
+    function renderQuestions() {
+        const container = document.getElementById('questionsContainer');
+        container.innerHTML = '';
+        standardQuestions.forEach((q, idx) => {
+            const html = `
+                <div class="bg-white p-6 question-card shadow-sm border border-gray-100">
+                    <p class="font-bold text-slate-800 mb-4 text-base leading-snug">
+                        <span data-i18n="${q.id}">---</span>
+                    </p>
+                    <div class="grid grid-cols-1 gap-2.5">
+                        ${q.options.map(opt => `
+                            <label class="flex items-center p-4 border rounded-2xl border-gray-100 bg-slate-50/50 active:bg-blue-50 transition cursor-pointer">
+                                <input type="radio" name="${q.id}" value="${opt}" class="w-5 h-5 mr-3 text-blue-600" required> 
+                                <span class="text-slate-600 text-sm font-medium" data-i18n="${opt}">---</span>
+                            </label>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+            container.insertAdjacentHTML('beforeend', html);
+        });
+    }
+
+    window.changeLang = function(lang) {
+        currentLang = lang;
+        document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(`btn-${lang}`).classList.add('active');
+
+        const dict = translations[lang] || translations['zh'];
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+            const key = el.getAttribute('data-i18n');
+            el.innerHTML = dict[key] || translations['zh'][key] || key;
+        });
+        document.querySelectorAll('[data-ph]').forEach(el => {
+            const key = el.getAttribute('data-ph');
+            el.placeholder = dict[key] || translations['zh'][key] || key;
+        });
+    };
+
+    document.getElementById('surveyForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btn = document.getElementById('submitBtn');
+        btn.disabled = true;
+        btn.innerHTML = "Uploading Data...";
+
+        const payload = {
+            sid: new URLSearchParams(window.location.search).get('sid'),
+            store: STORE_KEY_MAP[new URLSearchParams(window.location.search).get('sid')],
+            masseurId: document.getElementById('masseurId').value,
+            customer: document.getElementById('custName').value,
+            phone: document.getElementById('custPhone').value,
+            feedback: document.getElementById('suggestions').value,
+            lang: currentLang,
+            data: {},
+            timestamp: serverTimestamp()
+        };
+
+        standardQuestions.forEach(q => {
+            const checked = document.querySelector(`input[name="${q.id}"]:checked`);
+            payload.data[q.id] = checked ? checked.value : null;
+        });
+
+        try {
+            await addDoc(collection(db, 'group_surveys', 'v1', 'responses'), payload);
+            document.getElementById('successModal').classList.replace('modal-hide', 'modal-show');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        } catch (err) {
+            console.error("Firebase Error", err);
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = translations[currentLang].submitBtn || "Submit";
+        }
+    });
+
+    window.handleAction = (act) => {
+        if (act === 'Reviewed') window.open("https://maps.app.goo.gl/1Rto7b5TRNNF35yf8", "_blank");
+        document.getElementById('successModal').classList.replace('modal-show', 'modal-hide');
+    };
+
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            document.getElementById('submitBtn').disabled = false;
+            document.getElementById('submitBtn').classList.remove('opacity-50');
+            document.getElementById('conn-info').innerText = "STORE NETWORK CONNECTED - SECURE";
+        }
+    });
+
+    window.onload = () => { init(); signInAnonymously(auth); };
+</script>
+</body>
+</html>
