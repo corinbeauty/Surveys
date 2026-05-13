@@ -10,10 +10,9 @@
         body { font-family: 'Noto Sans TC', sans-serif; -webkit-tap-highlight-color: transparent; }
         .lang-btn { transition: all 0.3s ease; background-color: white; color: #4b5563; border: 1px solid #e5e7eb; }
         .lang-btn.active { background-color: #2563eb !important; color: white !important; border-color: #1e40af !important; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3); }
-        .question-card { border-radius: 1.5rem; border: 1px solid #f3f4f6; transition: transform 0.2s; }
+        .question-card { border-radius: 1.5rem; border: 1px solid #f3f4f6; }
         .modal-show { opacity: 1; pointer-events: auto; transform: scale(1); }
         .modal-hide { opacity: 0; pointer-events: none; transform: scale(0.95); }
-        #successModal { transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
         #errorOverlay { backdrop-filter: blur(10px); }
     </style>
 </head>
@@ -23,7 +22,6 @@
     <div class="text-7xl mb-6">🚫</div>
     <h2 class="text-2xl font-black text-slate-800 mb-2">連結已失效或不正確</h2>
     <p class="text-slate-500">請確認您掃描的是門市現場正確的 QR Code</p>
-    <div class="mt-8 text-[10px] text-slate-300 font-mono">ERROR_CODE: INVALID_SID_OR_STORE_KEY</div>
 </div>
 
 <div id="app" class="max-w-md mx-auto">
@@ -41,12 +39,9 @@
 
     <main class="px-4 space-y-4">
         <form id="surveyForm" class="space-y-4">
-            <div class="bg-white p-5 rounded-3xl border border-blue-100 shadow-sm flex items-center justify-between">
-                <div>
-                    <label class="block text-[10px] font-black text-blue-400 mb-1 uppercase tracking-tighter" data-i18n="branchLabel">服務分店 BRANCH</label>
-                    <div class="flex items-center text-gray-800 font-black text-xl italic">📍 <span id="storeDisplayName">---</span></div>
-                </div>
-                <div class="text-[10px] bg-slate-100 px-3 py-1.5 rounded-xl font-mono text-slate-400 font-bold" id="storeCodeTag">AUTH-ID</div>
+            <div class="bg-white p-5 rounded-3xl border border-blue-100 shadow-sm">
+                <label class="block text-[10px] font-black text-blue-400 mb-1 uppercase tracking-tighter" data-i18n="branchLabel">服務分店 BRANCH</label>
+                <div class="flex items-center text-gray-800 font-black text-xl italic">📍 <span id="storeDisplayName">---</span></div>
             </div>
 
             <!-- 動態題目容器 -->
@@ -55,9 +50,9 @@
             <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm space-y-5">
                 <h3 class="text-xs font-black text-blue-600 uppercase tracking-widest border-b pb-2 mb-4" data-i18n="guestInfo">貴賓資料 INFORMATION</h3>
                 
-                <div>
+                <div id="masseurIdGroup">
                     <label class="block text-xs font-bold text-gray-400 mb-2 uppercase" data-i18n="masseurIdLabel">師傅號碼 *</label>
-                    <input type="number" id="masseurId" required data-ph="ph_masseur" class="w-full p-4 bg-gray-50 border border-gray-200 rounded-2xl text-2xl font-black outline-none focus:ring-2 focus:ring-blue-500 placeholder:font-normal placeholder:text-gray-300">
+                    <input type="number" id="masseurId" data-ph="ph_masseur" class="w-full p-4 bg-gray-50 border border-gray-200 rounded-2xl text-2xl font-black outline-none focus:ring-2 focus:ring-blue-500">
                 </div>
 
                 <div class="grid grid-cols-1 gap-4">
@@ -124,61 +119,101 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    const STORE_KEY_MAP = {
-        'SID-ZG-101': '中港行館', 'SID-YL-102': '員林行館', 'SID-ZQ-103': '中清行館',
-        'SID-DL-104': '大里行館', 'SID-ZK-105': '中科行館', 'SID-SL-106': '沙鹿行館',
-        'SID-AH-107': '愛河行館', 'SID-FS-108': '鳳山行館', 'SID-ZY-109': '左營行館',
-        'SID-SD-110': '三多行館', 'SID-MS-111': '美術館行館', 'SID-FQ-112': '府前行館',
-        'SID-AP-113': '安平行館', 'SID-XS-114': '新生行館', 'SID-XY-115': '信義行館',
-        'SID-ZL-116': '中壢行館', 'SID-ZB-117': '竹北行館', 'SID-TP-118': '太平店',
-        'SID-FY-119': '豐原行館', 'SID-DX-120': '東興店', 'SID-WQ-121': '五權店'
-    };
-
+    // --- 門市與翻譯字典 ---
     const translations = {
         zh: {
             title: "服務意見調查表", branchLabel: "服務分店 BRANCH", guestInfo: "貴賓資料 INFORMATION", masseurIdLabel: "師傅號碼 *", custNameLabel: "貴賓姓名 *", phoneLabel: "聯絡電話 *", suggestLabel: "建議內容詳述", submitBtn: "提交問卷 Submit", ph_masseur: "輸入編號", ph_name: "輸入姓名", ph_phone: "輸入電話", ph_suggest: "您的寶貴建議...", modalTitle: "感謝您的回饋！", modalText: "您的支持是我們進步的動力。", modalGoGoogle: "馬上評論", modalClose: "下次再評",
+            // 共通選項
+            opt_y: "是", opt_n: "否", opt_vsat: "非常滿意", opt_sat: "滿意", opt_ok: "還好", opt_unsat: "不滿意", opt_vunsat: "非常不滿意",
+            // 特殊題型
+            t_age: "您的年齡", age_1: "20歲以下", age_2: "21-30歲", age_3: "31-40歲", age_4: "41-50歲", age_5: "51歲以上",
+            t_first: "是否第一次來？", t_from: "從哪裡來訪？", from_n: "北部", from_c: "中部", from_s: "南部", from_e: "東部",
+            t_source: "得知管道", src_1: "網路廣告", src_2: "粉絲專頁", src_3: "親友介紹", src_4: "實體海報", src_5: "品牌介紹", src_6: "路過",
+            t_room: "入住項目", rm_1: "單人床", rm_2: "豪華單人", rm_3: "單人房", rm_4: "雙人房", rm_5: "四人房",
+            sat_svc: "療程滿意度", sat_rm: "房間滿意度", sat_spa: "設施舒適度", sat_booking: "預約流程", sat_env: "環境舒適度", sat_intro: "櫃台介紹", sat_attitude: "美容師態度", sat_pro: "專業度", sat_relax: "放鬆感", sat_total: "整體滿意度", t_recommend: "是否願意推薦", t_revisit: "是否願意再次光臨",
+            // 標準 10 題
             zq1: "1. 有介紹號碼詢問項目嗎？", zq1_1: "主動介紹", zq1_2: "後來才問", zq1_3: "完全沒問",
             zq2: "2. 有主動詢問力道嗎？", zq2_1: "主動詢問", zq2_2: "被動回應", zq2_3: "完全不問",
             zq3: "3. 師傅有異味或煙味嗎？", zq3_1: "沒有異味", zq3_2: "稍微有點", zq3_3: "味道很重",
             zq4: "4. 時間掌握得當嗎？", zq4_1: "很好", zq4_2: "普通", zq4_3: "很差",
-            zq5: "5. 言語是否有不禮貌？", zq5_1: "良好有禮", zq5_2: "普通尚可", zq5_3: "言語不當",
+            zq5: "5. 言語是否有不禮貌？", zq5_1: "良好有禮", zq5_2: "普通", zq5_3: "言語不當",
             zq6: "6. 肢體觸碰讓你尷尬嗎？", zq6_1: "專業得體", zq6_2: "有點尷尬", zq6_3: "感覺很差",
             zq7: "7. 有開椎甩頭等危險動作？", zq7_1: "完全沒有", zq7_2: "有點危險", zq7_3: "非常危險",
             zq8: "8. 有邀請打卡按讚嗎？", zq8_1: "熱情主動", zq8_2: "非常被動", zq8_3: "完全沒說",
             zq9: "9. 有主動給名片嗎？", zq9_1: "熱情主動", zq9_2: "要了才給", zq9_3: "沒有給",
             zq10: "10. 下次還會再老點嗎？", zq10_1: "一定老點", zq10_2: "再試試看", zq10_3: "絕對不會"
         },
-        en: { title: "Service Survey", branchLabel: "Store Branch", guestInfo: "Guest Information", masseurIdLabel: "Staff ID *", custNameLabel: "Name *", phoneLabel: "Phone *", suggestLabel: "Feedback", submitBtn: "Submit", ph_masseur: "ID", ph_name: "Name", ph_phone: "Phone", ph_suggest: "Feedback...", modalTitle: "Thank You!", modalText: "We value your support.", modalGoGoogle: "Review Now", modalClose: "Later" },
-        ja: { title: "顧客満足度調査", branchLabel: "店舗", submitBtn: "送信", guestInfo: "ゲスト情報" },
-        ko: { title: "서비스 만족도 조사", branchLabel: "지점", submitBtn: "제출", guestInfo: "고객 정보" }
+        en: { 
+            title: "Survey", branchLabel: "Branch", guestInfo: "Information", submitBtn: "Submit", opt_y: "Yes", opt_n: "No",
+            // 英文翻譯以此類推...
+        },
+        ja: { title: "アンケート", branchLabel: "店舗", submitBtn: "送信" },
+        ko: { title: "설문지", branchLabel: "지점", submitBtn: "제출" }
     };
 
-    const standardQuestions = [
-        { id: 'zq1', options: ['zq1_1', 'zq1_2', 'zq1_3'] },
-        { id: 'zq2', options: ['zq2_1', 'zq2_2', 'zq2_3'] },
-        { id: 'zq3', options: ['zq3_1', 'zq3_2', 'zq3_3'] },
-        { id: 'zq4', options: ['zq4_1', 'zq4_2', 'zq4_3'] },
-        { id: 'zq5', options: ['zq5_1', 'zq5_2', 'zq5_3'] },
-        { id: 'zq6', options: ['zq6_1', 'zq6_2', 'zq6_3'] },
-        { id: 'zq7', options: ['zq7_1', 'zq7_2', 'zq7_3'] },
-        { id: 'zq8', options: ['zq8_1', 'zq8_2', 'zq8_3'] },
-        { id: 'zq9', options: ['zq9_1', 'zq9_2', 'zq9_3'] },
-        { id: 'zq10', options: ['zq10_1', 'zq10_2', 'zq10_3'] }
-    ];
+    const STORE_CONFIGS = {
+        'SID-PS-8892': { name: '帕夏健髮頭皮管理-公益店', type: 'pasha', google: 'https://maps.app.goo.gl/xxxx', showMasseur: false,
+            questions: [
+                { id: 't_age', type: 'radio', options: ['age_1', 'age_2', 'age_3', 'age_4', 'age_5'] },
+                { id: 't_source', type: 'radio', options: ['src_1', 'src_2', 'src_3', 'src_4', 'src_5', 'src_6'] },
+                { id: 't_first', type: 'radio', options: ['opt_y', 'opt_n'] },
+                { id: 'sat_svc', type: 'radio', options: ['opt_vsat', 'opt_sat', 'opt_ok', 'opt_unsat', 'opt_vunsat'] },
+                { id: 'sat_booking', type: 'radio', options: ['opt_vsat', 'opt_sat', 'opt_ok', 'opt_unsat', 'opt_vunsat'] },
+                { id: 'sat_env', type: 'radio', options: ['opt_vsat', 'opt_sat', 'opt_ok', 'opt_unsat', 'opt_vunsat'] },
+                { id: 'sat_attitude', type: 'radio', options: ['opt_vsat', 'opt_sat', 'opt_ok', 'opt_unsat', 'opt_vunsat'] },
+                { id: 'sat_total', type: 'radio', options: ['opt_vsat', 'opt_sat', 'opt_ok', 'opt_unsat', 'opt_vunsat'] }
+            ]
+        },
+        'SID-JS-3310': { name: '婧仕女微旅', type: 'jing', google: 'https://maps.app.goo.gl/yyyy', showMasseur: false,
+            questions: [
+                { id: 't_age', type: 'radio', options: ['age_1', 'age_2', 'age_3', 'age_4', 'age_5'] },
+                { id: 't_from', type: 'radio', options: ['from_n', 'from_c', 'from_s', 'from_e'] },
+                { id: 't_room', type: 'radio', options: ['rm_1', 'rm_2', 'rm_3', 'rm_4', 'rm_5'] },
+                { id: 'sat_rm', type: 'radio', options: ['opt_vsat', 'opt_sat', 'opt_ok', 'opt_unsat', 'opt_vunsat'] },
+                { id: 'sat_spa', type: 'radio', options: ['opt_vsat', 'opt_sat', 'opt_ok', 'opt_unsat', 'opt_vunsat'] },
+                { id: 'sat_total', type: 'radio', options: ['opt_vsat', 'opt_sat', 'opt_ok', 'opt_unsat', 'opt_vunsat'] }
+            ]
+        },
+        'DEFAULT': { type: 'std', showMasseur: true,
+            questions: [
+                { id: 'zq1', type: 'radio', options: ['zq1_1', 'zq1_2', 'zq1_3'] },
+                { id: 'zq2', type: 'radio', options: ['zq2_1', 'zq2_2', 'zq2_3'] },
+                { id: 'zq3', type: 'radio', options: ['zq3_1', 'zq3_2', 'zq3_3'] },
+                { id: 'zq4', type: 'radio', options: ['zq4_1', 'zq4_2', 'zq4_3'] },
+                { id: 'zq5', type: 'radio', options: ['zq5_1', 'zq5_2', 'zq5_3'] },
+                { id: 'zq6', type: 'radio', options: ['zq6_1', 'zq6_2', 'zq6_3'] },
+                { id: 'zq7', type: 'radio', options: ['zq7_1', 'zq7_2', 'zq7_3'] },
+                { id: 'zq8', type: 'radio', options: ['zq8_1', 'zq8_2', 'zq8_3'] },
+                { id: 'zq9', type: 'radio', options: ['zq9_1', 'zq9_2', 'zq9_3'] },
+                { id: 'zq10', type: 'radio', options: ['zq10_1', 'zq10_2', 'zq10_3'] }
+            ]
+        }
+    };
 
+    // 擴充標準店名清單
+    const BRANCH_NAMES = {
+        'SID-ZG-101': '中港行館', 'SID-YL-102': '員林行館', 'SID-ZQ-103': '中清行館', 'SID-DL-104': '大里行館',
+        'SID-ZK-105': '中科行館', 'SID-SL-106': '沙鹿行館', 'SID-AH-107': '愛河行館', 'SID-FS-108': '鳳山行館',
+        'SID-ZY-109': '左營行館', 'SID-SD-110': '三多行館', 'SID-MS-111': '美術館行館', 'SID-FQ-112': '府前行館',
+        'SID-AP-113': '安平行館', 'SID-XS-114': '新生行館', 'SID-XY-115': '信義行館', 'SID-ZL-116': '中壢行館',
+        'SID-ZB-117': '竹北行館', 'SID-TP-118': '太平店', 'SID-FY-119': '豐原行館', 'SID-DX-120': '東興店', 'SID-WQ-121': '五權店'
+    };
+
+    let activeConfig = null;
     let currentLang = 'zh';
 
     function init() {
         const sid = new URLSearchParams(window.location.search).get('sid');
-        const storeName = STORE_KEY_MAP[sid];
+        activeConfig = STORE_CONFIGS[sid] || { ...STORE_CONFIGS['DEFAULT'], name: BRANCH_NAMES[sid], sid: sid };
 
-        if (!storeName) {
+        if (!activeConfig.name) {
             document.getElementById('errorOverlay').classList.remove('hidden');
             return;
         }
 
-        document.getElementById('storeDisplayName').innerText = storeName;
-        document.getElementById('storeCodeTag').innerText = sid;
+        document.getElementById('storeDisplayName').innerText = activeConfig.name;
+        if (!activeConfig.showMasseur) document.getElementById('masseurIdGroup').style.display = 'none';
+
         renderQuestions();
         window.changeLang('zh');
     }
@@ -186,7 +221,7 @@
     function renderQuestions() {
         const container = document.getElementById('questionsContainer');
         container.innerHTML = '';
-        standardQuestions.forEach((q, idx) => {
+        activeConfig.questions.forEach((q, idx) => {
             const html = `
                 <div class="bg-white p-6 question-card shadow-sm border border-gray-100">
                     <p class="font-bold text-slate-800 mb-4 text-base leading-snug">
@@ -226,21 +261,21 @@
         e.preventDefault();
         const btn = document.getElementById('submitBtn');
         btn.disabled = true;
-        btn.innerHTML = "Uploading Data...";
+        btn.innerHTML = "Processing...";
 
         const payload = {
             sid: new URLSearchParams(window.location.search).get('sid'),
-            store: STORE_KEY_MAP[new URLSearchParams(window.location.search).get('sid')],
-            masseurId: document.getElementById('masseurId').value,
+            store: activeConfig.name,
             customer: document.getElementById('custName').value,
             phone: document.getElementById('custPhone').value,
             feedback: document.getElementById('suggestions').value,
+            masseurId: document.getElementById('masseurId').value || "N/A",
             lang: currentLang,
             data: {},
             timestamp: serverTimestamp()
         };
 
-        standardQuestions.forEach(q => {
+        activeConfig.questions.forEach(q => {
             const checked = document.querySelector(`input[name="${q.id}"]:checked`);
             payload.data[q.id] = checked ? checked.value : null;
         });
@@ -250,15 +285,15 @@
             document.getElementById('successModal').classList.replace('modal-hide', 'modal-show');
             window.scrollTo({ top: 0, behavior: 'smooth' });
         } catch (err) {
-            console.error("Firebase Error", err);
+            console.error("Error", err);
         } finally {
             btn.disabled = false;
-            btn.innerHTML = translations[currentLang].submitBtn || "Submit";
+            btn.innerHTML = translations[currentLang].submitBtn;
         }
     });
 
     window.handleAction = (act) => {
-        if (act === 'Reviewed') window.open("https://maps.app.goo.gl/1Rto7b5TRNNF35yf8", "_blank");
+        if (act === 'Reviewed') window.open(activeConfig.google, "_blank");
         document.getElementById('successModal').classList.replace('modal-show', 'modal-hide');
     };
 
@@ -266,7 +301,7 @@
         if (user) {
             document.getElementById('submitBtn').disabled = false;
             document.getElementById('submitBtn').classList.remove('opacity-50');
-            document.getElementById('conn-info').innerText = "STORE NETWORK CONNECTED - SECURE";
+            document.getElementById('conn-info').innerText = "SECURE CLOUD CONNECTED";
         }
     });
 
