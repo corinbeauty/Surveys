@@ -3,31 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>手舞足道集團 - 服務意見調查表</title>
+    <title>服務意見調查表</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap');
         body { font-family: 'Noto Sans TC', sans-serif; -webkit-tap-highlight-color: transparent; }
-        .lang-btn { transition: all 0.3s ease; background-color: white; color: #4b5563; border: 1px solid #e5e7eb; }
-        .lang-btn.active { background-color: #2563eb !important; color: white !important; border-color: #1e40af !important; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3); }
-        .question-card { border-radius: 1.5rem; border: 1px solid #f3f4f6; }
+        .lang-btn { transition: all 0.2s ease; background-color: white; color: #4b5563; border: 1px solid #e5e7eb; }
+        .lang-btn.active { background-color: #2563eb !important; color: white !important; border-color: #1e40af !important; box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2); }
+        .question-card { border-radius: 1.5rem; border: 1px solid #f3f4f6; transition: border 0.3s; }
         .modal-show { opacity: 1; pointer-events: auto; transform: scale(1); }
         .modal-hide { opacity: 0; pointer-events: none; transform: scale(0.95); }
-        #errorOverlay { backdrop-filter: blur(10px); }
+        #successModal { transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+        input:checked + span { color: #2563eb; font-weight: 900; }
+        #errorOverlay { backdrop-filter: blur(12px); }
     </style>
 </head>
 <body class="bg-slate-50 min-h-screen pb-12">
 
+<!-- 錯誤阻擋層 -->
 <div id="errorOverlay" class="fixed inset-0 z-[200] bg-white/95 flex flex-col items-center justify-center p-10 text-center hidden">
-    <div class="text-7xl mb-6">🚫</div>
+    <div class="text-6xl mb-6">🔗</div>
     <h2 class="text-2xl font-black text-slate-800 mb-2">連結已失效或不正確</h2>
     <p class="text-slate-500">請確認您掃描的是門市現場正確的 QR Code</p>
 </div>
 
 <div id="app" class="max-w-md mx-auto">
-    <header class="bg-white sticky top-0 z-20 shadow-sm px-4 py-4 mb-4 text-center border-b border-gray-100">
-        <h1 class="text-xl font-black text-slate-800 tracking-tight" data-i18n="title">服務意見調查表</h1>
-        <p id="conn-info" class="text-[8px] text-blue-500 font-mono tracking-widest uppercase italic font-bold">Authenticating Store Access...</p>
+    <header class="bg-white sticky top-0 z-20 shadow-sm px-4 py-4 mb-4 text-center">
+        <h1 class="text-xl font-black text-gray-800" data-i18n="title">服務意見調查表</h1>
+        <p id="conn-status" class="text-[9px] text-gray-300 font-mono tracking-tighter uppercase mt-1">Ready</p>
         
         <div class="flex justify-between gap-1 bg-gray-100 p-1 rounded-2xl border border-gray-200 mt-4">
             <button onclick="window.changeLang('zh')" id="btn-zh" class="lang-btn active flex-1 py-2.5 rounded-xl text-xs font-bold">中文</button>
@@ -39,31 +42,32 @@
 
     <main class="px-4 space-y-4">
         <form id="surveyForm" class="space-y-4">
-            <div class="bg-white p-5 rounded-3xl border border-blue-100 shadow-sm">
-                <label class="block text-[10px] font-black text-blue-400 mb-1 uppercase tracking-tighter" data-i18n="branchLabel">服務分店 BRANCH</label>
-                <div class="flex items-center text-gray-800 font-black text-xl italic">📍 <span id="storeDisplayName">---</span></div>
+            <!-- 門市顯示 (不顯示 SID) -->
+            <div class="bg-white p-6 rounded-3xl border border-blue-100 shadow-sm">
+                <label class="block text-[10px] font-bold text-blue-400 mb-1 uppercase tracking-tighter" data-i18n="branchLabel">服務分店</label>
+                <div class="flex items-center text-gray-800 font-black text-xl italic">📍 <span id="storeNameText">---</span></div>
             </div>
 
-            <!-- 動態題目容器 -->
-            <div id="questionsContainer" class="space-y-4"></div>
+            <!-- 動態題目區 -->
+            <div id="dynamicQuestions" class="space-y-4"></div>
 
+            <!-- 客資區 -->
             <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm space-y-5">
-                <h3 class="text-xs font-black text-blue-600 uppercase tracking-widest border-b pb-2 mb-4" data-i18n="guestInfo">貴賓資料 INFORMATION</h3>
+                <h3 class="text-xs font-black text-blue-600 uppercase tracking-widest border-b pb-2 mb-2" data-i18n="guestInfo">貴賓資料 Information</h3>
                 
-                <div id="masseurIdGroup">
+                <div id="masseurSection">
                     <label class="block text-xs font-bold text-gray-400 mb-2 uppercase" data-i18n="masseurIdLabel">師傅號碼 *</label>
-                    <input type="number" id="masseurId" data-ph="ph_masseur" class="w-full p-4 bg-gray-50 border border-gray-200 rounded-2xl text-2xl font-black outline-none focus:ring-2 focus:ring-blue-500">
+                    <input type="number" id="masseurId" data-ph="ph_masseur" class="w-full p-4 bg-gray-50 border border-gray-200 rounded-2xl text-xl font-bold outline-none focus:ring-2 focus:ring-blue-500">
                 </div>
 
-                <div class="grid grid-cols-1 gap-4">
-                    <div>
-                        <label class="block text-xs font-bold text-gray-400 mb-2 uppercase" data-i18n="custNameLabel">貴賓姓名 *</label>
-                        <input type="text" id="custName" required data-ph="ph_name" class="w-full p-4 bg-gray-50 border border-gray-200 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-gray-400 mb-2 uppercase" data-i18n="phoneLabel">聯絡電話 *</label>
-                        <input type="tel" id="custPhone" required data-ph="ph_phone" class="w-full p-4 bg-gray-50 border border-gray-200 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500">
-                    </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-400 mb-2 uppercase" data-i18n="custNameLabel">姓名 *</label>
+                    <input type="text" id="custName" required data-ph="ph_name" class="w-full p-4 bg-gray-50 border border-gray-200 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-400 mb-2 uppercase" data-i18n="phoneLabel">電話 *</label>
+                    <input type="tel" id="custPhone" required data-ph="ph_phone" class="w-full p-4 bg-gray-50 border border-gray-200 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500">
                 </div>
 
                 <div>
@@ -78,6 +82,7 @@
         </form>
     </main>
 
+    <!-- 成功彈窗 -->
     <div id="successModal" class="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-slate-900/80 backdrop-blur-md modal-hide">
         <div class="bg-white w-full max-w-sm rounded-[2.5rem] overflow-hidden shadow-2xl text-center border-b-8 border-amber-400">
             <div class="bg-blue-600 py-10 text-white">
@@ -86,15 +91,15 @@
                         <img src="https://cdn-icons-png.flaticon.com/512/1160/1160358.png" alt="Success" class="w-full h-full object-contain">
                     </div>
                 </div>
-                <h3 class="text-2xl font-black italic" data-i18n="modalTitle">感謝您的回饋！</h3>
+                <h3 class="text-2xl font-black italic" data-i18n="modalTitle">感謝回饋</h3>
             </div>
             <div class="p-8 space-y-6">
-                <p id="modalText" class="text-gray-600 font-bold text-sm leading-relaxed" data-i18n="modalText">我們已收到您的意見。</p>
+                <p id="modalText" class="text-gray-600 font-bold text-sm leading-relaxed" data-i18n="modalText">我們已收到您的寶貴意見。</p>
                 <div class="space-y-3">
-                    <button id="googleReviewBtn" onclick="handleAction('Reviewed')" class="bg-amber-400 text-slate-900 block w-full font-black py-4 rounded-2xl shadow-lg text-lg">
-                        ⭐ <span data-i18n="modalGoGoogle">Google 評論</span>
+                    <button onclick="handleMarketing('Reviewed')" class="bg-amber-400 text-slate-900 block w-full font-black py-4 rounded-2xl shadow-lg text-lg flex items-center justify-center gap-2">
+                        <span>⭐</span> <span data-i18n="modalGoGoogle">馬上評論</span>
                     </button>
-                    <button onclick="handleAction('Dismissed')" class="bg-slate-100 text-slate-400 block w-full font-bold py-3 rounded-2xl text-sm" data-i18n="modalClose">下次再評</button>
+                    <button onclick="handleMarketing('Dismissed')" class="bg-slate-100 text-slate-400 block w-full font-bold py-3 rounded-2xl text-sm" data-i18n="modalClose">下次再評</button>
                 </div>
             </div>
         </div>
@@ -115,169 +120,152 @@
         appId: "1:874594469122:web:2b2c1208b20d2095b9ae1b"
     };
 
-    const firebaseApp = initializeApp(firebaseConfig);
-    const auth = getAuth(firebaseApp);
-    const db = getFirestore(firebaseApp);
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const internalAppId = typeof __app_id !== 'undefined' ? __app_id : 'v3-secure-survey';
 
-    const translations = {
+    // --- 23 門市對應與 Google 評論連結 ---
+    const DEFAULT_GOOGLE = 'https://maps.app.goo.gl/1Rto7b5TRNNF35yf8'; // 中清預設
+    const STORE_MAP = {
+        'SID-ZG-101': { name: '中港行館', type: 'standard', google: DEFAULT_GOOGLE },
+        'SID-YL-102': { name: '員林行館', type: 'standard', google: DEFAULT_GOOGLE },
+        'SID-ZQ-103': { name: '中清行館', type: 'standard', google: DEFAULT_GOOGLE },
+        'SID-DL-104': { name: '大里行館', type: 'standard', google: DEFAULT_GOOGLE },
+        'SID-ZK-105': { name: '中科行館', type: 'standard', google: DEFAULT_GOOGLE },
+        'SID-SL-106': { name: '沙鹿行館', type: 'standard', google: DEFAULT_GOOGLE },
+        'SID-AH-107': { name: '愛河行館', type: 'standard', google: DEFAULT_GOOGLE },
+        'SID-FS-108': { name: '鳳山行館', type: 'standard', google: DEFAULT_GOOGLE },
+        'SID-ZY-109': { name: '左營行館', type: 'standard', google: DEFAULT_GOOGLE },
+        'SID-SD-110': { name: '三多行館', type: 'standard', google: DEFAULT_GOOGLE },
+        'SID-MS-111': { name: '美術館行館', type: 'standard', google: DEFAULT_GOOGLE },
+        'SID-FQ-112': { name: '府前行館', type: 'standard', google: DEFAULT_GOOGLE },
+        'SID-AP-113': { name: '安平行館', type: 'standard', google: DEFAULT_GOOGLE },
+        'SID-XS-114': { name: '新生行館', type: 'standard', google: DEFAULT_GOOGLE },
+        'SID-XY-115': { name: '信義行館', type: 'standard', google: DEFAULT_GOOGLE },
+        'SID-ZL-116': { name: '中壢行館', type: 'standard', google: DEFAULT_GOOGLE },
+        'SID-ZB-117': { name: '竹北行館', type: 'standard', google: DEFAULT_GOOGLE },
+        'SID-TP-118': { name: '太平店', type: 'standard', google: DEFAULT_GOOGLE },
+        'SID-FY-119': { name: '豐原行館', type: 'standard', google: DEFAULT_GOOGLE },
+        'SID-DX-120': { name: '東興店', type: 'standard', google: DEFAULT_GOOGLE },
+        'SID-WQ-121': { name: '五權店', type: 'standard', google: DEFAULT_GOOGLE },
+        'SID-PS-8892': { name: '帕夏健髮頭皮管理-公益店', type: 'pasha', google: 'https://maps.app.goo.gl/JYrfS6tjnXe2b5Zg6?g_st=ac' },
+        'SID-JS-3310': { name: '婧仕女微旅', type: 'jing', google: 'https://maps.app.goo.gl/6axGD9A8D4jQ3oHX6?g_st=ac' }
+    };
+
+    const dicts = {
         zh: {
-            title: "服務意見調查表", branchLabel: "服務分店 BRANCH", guestInfo: "貴賓資料 INFORMATION", masseurIdLabel: "師傅號碼 *", custNameLabel: "貴賓姓名 *", phoneLabel: "聯絡電話 *", suggestLabel: "建議內容詳述", submitBtn: "提交問卷 Submit", ph_masseur: "輸入編號", ph_name: "輸入姓名", ph_phone: "輸入電話", ph_suggest: "您的寶貴建議...", modalTitle: "感謝您的回饋！", modalText: "您的支持是我們進步的動力。", modalGoGoogle: "馬上評論", modalClose: "下次再評",
-            opt_y: "是", opt_n: "否", opt_vsat: "非常滿意", opt_sat: "滿意", opt_ok: "還好", opt_unsat: "不滿意", opt_vunsat: "非常不滿意",
-            t_age: "您的年齡", age_1: "20歲以下", age_2: "21-30歲", age_3: "31-40歲", age_4: "41-50歲", age_5: "51歲以上",
-            t_first: "是否第一次來？", t_from: "從哪裡來訪？", from_n: "北部", from_c: "中部", from_s: "南部", from_e: "東部",
-            t_source: "得知管道", src_1: "網路廣告", src_2: "粉絲專頁", src_3: "親友介紹", src_4: "實體海報", src_5: "品牌介紹", src_6: "路過",
-            t_room: "入住項目", rm_1: "單人床", rm_2: "豪華單人", rm_3: "單人房", rm_4: "雙人房", rm_5: "四人房",
-            sat_svc: "療程滿意度", sat_rm: "房間滿意度", sat_spa: "設施舒適度", sat_booking: "預約流程", sat_env: "環境舒適度", sat_intro: "櫃台介紹", sat_attitude: "美容師態度", sat_pro: "專業度", sat_relax: "放鬆感", sat_total: "整體滿意度", t_recommend: "是否願意推薦", t_revisit: "是否願意再次光臨",
-            zq1: "1. 有介紹號碼詢問項目嗎？", zq1_1: "主動介紹", zq1_2: "後來才問", zq1_3: "完全沒問",
-            zq2: "2. 有主動詢問力道嗎？", zq2_1: "主動詢問", zq2_2: "被動回應", zq2_3: "完全不問",
-            zq3: "3. 師傅有異味或煙味嗎？", zq3_1: "沒有異味", zq3_2: "稍微有點", zq3_3: "味道很重",
-            zq4: "4. 時間掌握得當嗎？", zq4_1: "很好", zq4_2: "普通", zq4_3: "很差",
-            zq5: "5. 言語是否有不禮貌？", zq5_1: "良好有禮", zq5_2: "普通", zq5_3: "言語不當",
-            zq6: "6. 肢體觸碰讓你尷尬嗎？", zq6_1: "專業得體", zq6_2: "有點尷尬", zq6_3: "感覺很差",
-            zq7: "7. 有開椎甩頭等危險動作？", zq7_1: "完全沒有", zq7_2: "有點危險", zq7_3: "非常危險",
-            zq8: "8. 有邀請打卡按讚嗎？", zq8_1: "熱情主動", zq8_2: "非常被動", zq8_3: "完全沒說",
-            zq9: "9. 有主動給名片嗎？", zq9_1: "熱情主動", zq9_2: "要了才給", zq9_3: "沒有給",
-            zq10: "10. 下次還會再老點嗎？", zq10_1: "一定老點", zq10_2: "再試試看", zq10_3: "絕對不會"
+            title: "服務意見調查表", branchLabel: "服務分店", guestInfo: "貴賓資料 Information", masseurIdLabel: "師傅號碼 *", custNameLabel: "姓名 *", phoneLabel: "電話 *", suggestLabel: "建議內容", submitBtn: "提交問卷 Submit", ph_masseur: "編號", ph_name: "姓名", ph_phone: "電話", ph_suggest: "您的寶貴意見...", modalTitle: "感謝您的回饋！", modalText: "您的支持是我們進步的動力。<br>邀請您留下 5 星好評！", modalGoGoogle: "馬上評論", modalClose: "下次再評",
+            y: "是", n: "否", vs: "非常滿意", s: "滿意", o: "還好", u: "不滿意", vu: "非常不滿意",
+            age: "3. 您的年齡", age1: "20歲以下", age2: "21-30歲", age3: "31-40歲", age4: "41-50歲", age5: "51歲以上",
+            src: "從哪裡得知我們？", src1: "網路廣告", src2: "FB/IG/Threads", src3: "親友介紹", src4: "實體海報", src5: "集團品牌", src6: "路過",
+            svc: "體驗項目 (可複選)", svc1: "臉部甦妍-保濕", svc2: "臉部甦妍-小氣泡", svc3: "精油按摩", svc4: "熱石能量", svc5: "全身去角質", svc6: "耳燭", svc9: "頭皮養護", svc15: "岩盤浴", svc16: "水療SPA",
+            sat_svc: "設施/療程滿意度", sat_book: "預約流程滿意度", sat_env: "環境舒適度", sat_intro: "櫃台服務介紹", sat_att: "人員服務態度", sat_pro: "療程專業度", sat_relax: "放鬆與舒適感", sat_total: "整體滿意度",
+            rec: "願意推薦給親友", rev: "願意再次光臨", frm: "從哪裡來訪", f_n: "北部", f_c: "中部", f_s: "南部", f_e: "東部",
+            rm: "房型項目", rm1: "單人床位", rm2: "豪華單人", rm3: "單人房", rm4: "雙人房", rm5: "四人房",
+            q1: "1. 有介紹號碼與詢問項目嗎?", q1_1: "主動介紹", q1_2: "後來才問", q1_3: "完全沒問",
+            q2: "2. 過程有主動詢問力道嗎?", q2_1: "主動詢問", q2_2: "被動回應", q2_3: "完全不問",
+            q3: "3. 師傅是否有異味或煙味?", q3_1: "沒有異味", q3_2: "稍微有點", q3_3: "味道很重",
+            q10: "10. 下次還會想老點他嗎?", q10_1: "一定老點", q10_2: "再試試看", q10_3: "絕對不會"
         },
-        en: { 
-            title: "Survey", branchLabel: "Branch", guestInfo: "Information", masseurIdLabel: "Masseur ID *", custNameLabel: "Name *", phoneLabel: "Phone *", suggestLabel: "Feedback", submitBtn: "Submit", ph_masseur: "No.", ph_name: "Name", ph_phone: "Phone", ph_suggest: "Feedback...", modalTitle: "Thank You!", modalText: "We value your support.", modalGoGoogle: "Review Now", modalClose: "Close",
-            opt_y: "Yes", opt_n: "No", opt_vsat: "Very Satisfied", opt_sat: "Satisfied", opt_ok: "Fair", opt_unsat: "Unsatisfied", opt_vunsat: "Poor",
-            t_age: "Your Age", age_1: "Under 20", age_2: "21-30", age_3: "31-40", age_4: "41-50", age_5: "Over 51",
-            t_first: "First time?", t_from: "From?", from_n: "North", from_c: "Central", from_s: "South", from_e: "East",
-            t_source: "Channel", src_1: "Ads", src_2: "Social", src_3: "Friends", src_4: "Poster", src_5: "Brand", src_6: "Passed",
-            t_room: "Room Type", rm_1: "Single", rm_2: "Deluxe Single", rm_3: "Single Room", rm_4: "Double", rm_5: "Quad",
-            sat_svc: "Service Satisfied", sat_rm: "Room Satisfied", sat_spa: "SPA Satisfied", sat_booking: "Booking Flow", sat_env: "Environment", sat_intro: "Front Desk", sat_attitude: "Attitude", sat_pro: "Professional", sat_relax: "Relaxation", sat_total: "Overall", t_recommend: "Recommend?", t_revisit: "Re-visit?",
-            zq1: "1. ID Intro?", zq1_1: "Active", zq1_2: "Late", zq1_3: "No",
-            zq2: "2. Pressure?", zq2_1: "Active", zq2_2: "Passive", zq2_3: "No",
-            zq3: "3. Odor?", zq3_1: "No", zq3_2: "Slight", zq3_3: "Strong",
-            zq4: "4. Timing?", zq4_1: "Good", zq4_2: "Fair", zq4_3: "Poor",
-            zq5: "5. Manners?", zq5_1: "Good", zq5_2: "Fair", zq5_3: "Rude",
-            zq6: "6. Touching?", zq6_1: "Pro", zq6_2: "Awkward", zq6_3: "Bad",
-            zq7: "7. Danger?", zq7_1: "None", zq7_2: "Risky", zq7_3: "Bad",
-            zq8: "8. Check-in?", zq8_1: "Active", zq8_2: "Passive", zq8_3: "No",
-            zq9: "9. Card?", zq9_1: "Active", zq9_2: "Req", zq9_3: "No",
-            zq10: "10. Rebook?", zq10_1: "Yes", zq10_2: "Maybe", zq10_3: "No"
+        en: {
+            title: "Service Survey", branchLabel: "Branch", guestInfo: "Guest Information", masseurIdLabel: "Staff ID *", custNameLabel: "Name *", phoneLabel: "Phone *", suggestLabel: "Feedback", submitBtn: "Submit Survey", ph_masseur: "ID", ph_name: "Name", ph_phone: "Phone", ph_suggest: "Your suggestions...", modalTitle: "Thank You!", modalText: "We value your support.", modalGoGoogle: "Review Now", modalClose: "Later",
+            y: "Yes", n: "No", vs: "Excellent", s: "Good", o: "Fair", u: "Poor", vu: "Bad",
+            age: "3. Your Age", age1: "Under 20", age2: "21-30", age3: "31-40", age4: "41-50", age5: "Above 51"
         },
-        ja: { 
-            title: "アンケート", branchLabel: "店舗 BRANCH", guestInfo: "情報 INFORMATION", masseurIdLabel: "スタッフ番号 *", custNameLabel: "お名前 *", phoneLabel: "電話番号 *", suggestLabel: "ご意見", submitBtn: "送信 Submit", ph_masseur: "番号入力", ph_name: "名前入力", ph_phone: "電話入力", ph_suggest: "ご意見...", modalTitle: "ありがとうございます！", modalText: "皆様のご意見を大切にします。", modalGoGoogle: "レビューを書く", modalClose: "閉じる",
-            opt_y: "はい", opt_n: "いいえ", opt_vsat: "非常に満足", opt_sat: "満足", opt_ok: "普通", opt_unsat: "不満", opt_vunsat: "非常に不満",
-            t_age: "年齢", age_1: "20歳以下", age_2: "21-30歳", age_3: "31-40歳", age_4: "41-50歳", age_5: "51歳以上",
-            t_first: "初めてですか？", t_from: "どちらから？", from_n: "北部", from_c: "中部", from_s: "南部", from_e: "東部",
-            t_source: "紹介チャンネル", src_1: "広告", src_2: "SNS", src_3: "紹介", src_4: "ポスター", src_5: "ブランド", src_6: "通りすがり",
-            t_room: "部屋タイプ", rm_1: "シングル", rm_2: "デラックス", rm_3: "個室", rm_4: "ダブル", rm_5: "クアッド",
-            sat_svc: "サービス満足度", sat_rm: "お部屋満足度", sat_spa: "施設満足度", sat_booking: "予約の流れ", sat_env: "環境の快適さ", sat_intro: "フロント案内", sat_attitude: "スタッフの態度", sat_pro: "専門性", sat_relax: "リラックス感", sat_total: "全体満足度", t_recommend: "推薦しますか", t_revisit: "再訪しますか",
-            zq1: "1. 番号紹介はありましたか？", zq1_1: "積極的", zq1_2: "後から", zq1_3: "なし",
-            zq2: "2. 力加減の確認は？", zq2_1: "積極的", zq2_2: "受動的", zq2_3: "なし",
-            zq3: "3. 臭いは気になりましたか？", zq3_1: "なし", zq3_2: "少し", zq3_3: "強い",
-            zq4: "4. 時間管理は適切？", zq4_1: "良い", zq4_2: "普通", zq4_3: "悪い",
-            zq5: "5. 言葉遣いは？", zq5_1: "丁寧", zq5_2: "普通", zq5_3: "不適切",
-            zq6: "6. 身体接触は適切？", zq6_1: "専門的", zq6_2: "気まずい", zq6_3: "悪い",
-            zq7: "7. 危険な動作は？", zq7_1: "なし", zq7_2: "少し", zq7_3: "危険",
-            zq8: "8. SNS紹介は？", zq8_1: "積極的", zq8_2: "受動的", zq8_3: "なし",
-            zq9: "9. 名刺はもらいましたか？", zq9_1: "積極的", zq9_2: "求めたら", zq9_3: "なし",
-            zq10: "10. 次回も指名しますか？", zq10_1: "必ず指名", zq10_2: "検討中", zq10_3: "しない"
+        ja: {
+            title: "お客様満足度調査", branchLabel: "店舗", guestInfo: "お客様情報", masseurIdLabel: "スタッフ番号 *", custNameLabel: "お名前 *", phoneLabel: "お電話 *", suggestLabel: "ご意見", submitBtn: "アンケート送信", ph_masseur: "番号", ph_name: "お名前", ph_phone: "お電話", ph_suggest: "ご意見...", modalTitle: "ありがとうございます", modalText: "皆様のご意見が励みになります。", modalGoGoogle: "レビューを書く", modalClose: "また今度",
+            y: "はい", n: "いいえ", vs: "大変満足", s: "満足", o: "普通", u: "不満", vu: "非常に不満",
+            age: "3. 年齢", age1: "20歳以下", age2: "21-30歳", age3: "31-40歳", age4: "41-50歳", age5: "51歳以上",
+            src: "どこで知りましたか？", src1: "ネット広告", src2: "SNS", src3: "紹介", src4: "ポスター", src5: "ブランド", src6: "通りがかり",
+            svc: "体験コース (複数可)", sat_svc: "施術満足度", sat_book: "予約の流れ", sat_env: "環境の快適さ", sat_intro: "受付の説明", sat_att: "スタッフの態度", sat_pro: "専門性", sat_relax: "リラックス感", sat_total: "全体満足度",
+            rec: "推薦したいですか？", rev: "再来店したいですか？", frm: "どちらからお越しですか？", f_n: "北部", f_c: "中部", f_s: "南部", f_e: "東部"
         },
-        ko: { 
-            title: "설문조사", branchLabel: "지점 BRANCH", guestInfo: "정보 INFORMATION", masseurIdLabel: "관리사 번호 *", custNameLabel: "성함 *", phoneLabel: "전화번호 *", suggestLabel: "의견", submitBtn: "제출 Submit", ph_masseur: "번호 입력", ph_name: "이름 입력", ph_phone: "전화 입력", ph_suggest: "소중한 의견...", modalTitle: "감사합니다!", modalText: "더 나은 서비스를 위해 노력하겠습니다.", modalGoGoogle: "리뷰 작성", modalClose: "닫기",
-            opt_y: "예", opt_n: "아니오", opt_vsat: "매우 만족", opt_sat: "만족", opt_ok: "보통", opt_unsat: "불만족", opt_vunsat: "매우 불만족",
-            t_age: "연령대", age_1: "20세 이하", age_2: "21-30세", age_3: "31-40세", age_4: "41-50세", age_5: "51세 이상",
-            t_first: "첫 방문입니까?", t_from: "거주 지역", from_n: "북부", from_c: "중부", from_s: "남부", from_e: "동부",
-            t_source: "인지 경로", src_1: "온라인 광고", src_2: "SNS", src_3: "지인 소개", src_4: "포스터", src_5: "브랜드 소개", src_6: "지나가는 길",
-            t_room: "이용 룸", rm_1: "싱글 베드", rm_2: "디럭스 싱글", rm_3: "싱글 룸", rm_4: "더블 룸", rm_5: "쿼드 룸",
-            sat_svc: "서비스 만족도", sat_rm: "객실 만족도", sat_spa: "시설 만족도", sat_booking: "예약 과정", sat_env: "환경 쾌적함", sat_intro: "프런트 안내", sat_attitude: "직원 태도", sat_pro: "전문성", sat_relax: "긴장 완화", sat_total: "전체 만족도", t_recommend: "추천 의향", t_revisit: "재방문 의향",
-            zq1: "1. 번호 및 항목 안내는?", zq1_1: "적극적", zq1_2: "나중에", zq1_3: "없음",
-            zq2: "2. 압력 세기 확인은?", zq2_1: "적극적", zq2_2: "수동적", zq2_3: "없음",
-            zq3: "3. 냄새가 불편했나요?", zq3_1: "없음", zq3_2: "약간", zq3_3: "심함",
-            zq4: "4. 시간 관리는?", zq4_1: "좋음", zq4_2: "보통", zq4_3: "나쁨",
-            zq5: "5. 언행은 정중했나요?", zq5_1: "친절함", zq5_2: "보통", zq5_3: "무례함",
-            zq6: "6. 신체 접촉은 적절했나요?", zq6_1: "전문적", zq6_2: "부자연스러움", zq6_3: "불편함",
-            zq7: "7. 위험한 동작이 있었나요?", zq7_1: "없음", zq7_2: "약간 위험", zq7_3: "위험함",
-            zq8: "8. 이벤트 안내는?", zq8_1: "적극적", zq8_2: "수동적", zq8_3: "없음",
-            zq9: "9. 명함을 받았나요?", zq9_1: "적극적", zq9_2: "요청시", zq9_3: "없음",
-            zq10: "10. 재지명 의사가 있나요?", zq10_1: "꼭 지명함", zq10_2: "생각중", zq10_3: "안함"
+        ko: {
+            title: "서비스 만족도 설문", branchLabel: "지점", guestInfo: "고객 정보", masseurIdLabel: "관리사 번호 *", custNameLabel: "성함 *", phoneLabel: "연락처 *", suggestLabel: "의견", submitBtn: "설문 제출", ph_masseur: "번호", ph_name: "성함", ph_phone: "연락처", ph_suggest: "의견을 남겨주세요...", modalTitle: "감사합니다", modalText: "고객님의 의견이 큰 힘이 됩니다.", modalGoGoogle: "리뷰 남기기", modalClose: "닫기",
+            y: "예", n: "아니오", vs: "매우 만족", s: "만족", o: "보통", u: "불만족", vu: "매우 불만족",
+            age: "3. 연령대", age1: "20세 이하", age2: "21-30세", age3: "31-40세", age4: "41-50세", age5: "51세 이상",
+            src: "어떻게 알고 오셨나요?", src1: "인터넷 광고", src2: "SNS", src3: "지인 추천", src4: "포스터", src5: "브랜드 소개", src6: "방문",
+            svc: "체험 항목 (중복 선택)", sat_svc: "시설/시술 만족도", sat_book: "예약 만족도", sat_env: "환경 만족도", sat_intro: "직원 안내", sat_att: "관리사 태도", sat_pro: "전문성", sat_relax: "편안함", sat_total: "종합 만족도",
+            rec: "추천 의향", rev: "재방문 의향", frm: "방문 지역", f_n: "북부", f_c: "중부", f_s: "남부", f_e: "동부"
         }
     };
 
-    const STORE_CONFIGS = {
-        'SID-PS-8892': { name: '帕夏健髮頭皮管理-公益店', type: 'pasha', google: 'https://maps.app.goo.gl/xxxx', showMasseur: false,
-            questions: [
-                { id: 't_age', type: 'radio', options: ['age_1', 'age_2', 'age_3', 'age_4', 'age_5'] },
-                { id: 't_source', type: 'radio', options: ['src_1', 'src_2', 'src_3', 'src_4', 'src_5', 'src_6'] },
-                { id: 't_first', type: 'radio', options: ['opt_y', 'opt_n'] },
-                { id: 'sat_svc', type: 'radio', options: ['opt_vsat', 'opt_sat', 'opt_ok', 'opt_unsat', 'opt_vunsat'] },
-                { id: 'sat_booking', type: 'radio', options: ['opt_vsat', 'opt_sat', 'opt_ok', 'opt_unsat', 'opt_vunsat'] },
-                { id: 'sat_env', type: 'radio', options: ['opt_vsat', 'opt_sat', 'opt_ok', 'opt_unsat', 'opt_vunsat'] },
-                { id: 'sat_attitude', type: 'radio', options: ['opt_vsat', 'opt_sat', 'opt_ok', 'opt_unsat', 'opt_vunsat'] },
-                { id: 'sat_total', type: 'radio', options: ['opt_vsat', 'opt_sat', 'opt_ok', 'opt_unsat', 'opt_vunsat'] }
-            ]
-        },
-        'SID-JS-3310': { name: '婧仕女微旅', type: 'jing', google: 'https://maps.app.goo.gl/yyyy', showMasseur: false,
-            questions: [
-                { id: 't_age', type: 'radio', options: ['age_1', 'age_2', 'age_3', 'age_4', 'age_5'] },
-                { id: 't_from', type: 'radio', options: ['from_n', 'from_c', 'from_s', 'from_e'] },
-                { id: 't_room', type: 'radio', options: ['rm_1', 'rm_2', 'rm_3', 'rm_4', 'rm_5'] },
-                { id: 'sat_rm', type: 'radio', options: ['opt_vsat', 'opt_sat', 'opt_ok', 'opt_unsat', 'opt_vunsat'] },
-                { id: 'sat_spa', type: 'radio', options: ['opt_vsat', 'opt_sat', 'opt_ok', 'opt_unsat', 'opt_vunsat'] },
-                { id: 'sat_total', type: 'radio', options: ['opt_vsat', 'opt_sat', 'opt_ok', 'opt_unsat', 'opt_vunsat'] }
-            ]
-        },
-        'DEFAULT': { type: 'std', showMasseur: true,
-            questions: [
-                { id: 'zq1', type: 'radio', options: ['zq1_1', 'zq1_2', 'zq1_3'] },
-                { id: 'zq2', type: 'radio', options: ['zq2_1', 'zq2_2', 'zq2_3'] },
-                { id: 'zq3', type: 'radio', options: ['zq3_1', 'zq3_2', 'zq3_3'] },
-                { id: 'zq4', type: 'radio', options: ['zq4_1', 'zq4_2', 'zq4_3'] },
-                { id: 'zq5', type: 'radio', options: ['zq5_1', 'zq5_2', 'zq5_3'] },
-                { id: 'zq6', type: 'radio', options: ['zq6_1', 'zq6_2', 'zq6_3'] },
-                { id: 'zq7', type: 'radio', options: ['zq7_1', 'zq7_2', 'zq7_3'] },
-                { id: 'zq8', type: 'radio', options: ['zq8_1', 'zq8_2', 'zq8_3'] },
-                { id: 'zq9', type: 'radio', options: ['zq9_1', 'zq9_2', 'zq9_3'] },
-                { id: 'zq10', type: 'radio', options: ['zq10_1', 'zq10_2', 'zq10_3'] }
-            ]
-        }
-    };
-
-    const BRANCH_NAMES = {
-        'SID-ZG-101': '中港行館', 'SID-YL-102': '員林行館', 'SID-ZQ-103': '中清行館', 'SID-DL-104': '大里行館',
-        'SID-ZK-105': '中科行館', 'SID-SL-106': '沙鹿行館', 'SID-AH-107': '愛河行館', 'SID-FS-108': '鳳山行館',
-        'SID-ZY-109': '左營行館', 'SID-SD-110': '三多行館', 'SID-MS-111': '美術館行館', 'SID-FQ-112': '府前行館',
-        'SID-AP-113': '安平行館', 'SID-XS-114': '新生行館', 'SID-XY-115': '信義行館', 'SID-ZL-116': '中壢行館',
-        'SID-ZB-117': '竹北行館', 'SID-TP-118': '太平店', 'SID-FY-119': '豐原行館', 'SID-DX-120': '東興店', 'SID-WQ-121': '五權店'
-    };
-
-    let activeConfig = null;
-    let currentLang = 'zh';
+    let activeSid = null;
+    let activeLang = 'zh';
 
     function init() {
-        const sid = new URLSearchParams(window.location.search).get('sid');
-        activeConfig = STORE_CONFIGS[sid] || { ...STORE_CONFIGS['DEFAULT'], name: BRANCH_NAMES[sid], sid: sid };
-
-        if (!activeConfig.name) {
+        const urlParams = new URLSearchParams(window.location.search);
+        activeSid = urlParams.get('sid');
+        
+        if (!activeSid || !STORE_MAP[activeSid]) {
             document.getElementById('errorOverlay').classList.remove('hidden');
             return;
         }
 
-        document.getElementById('storeDisplayName').innerText = activeConfig.name;
-        if (!activeConfig.showMasseur) document.getElementById('masseurIdGroup').style.display = 'none';
-
+        document.getElementById('storeNameText').innerText = STORE_MAP[activeSid].name;
         renderQuestions();
         window.changeLang('zh');
     }
 
     function renderQuestions() {
-        const container = document.getElementById('questionsContainer');
+        const container = document.getElementById('dynamicQuestions');
         container.innerHTML = '';
-        activeConfig.questions.forEach((q) => {
+        const config = STORE_MAP[activeSid];
+        let qList = [];
+
+        if (config.type === 'standard') {
+            document.getElementById('masseurSection').style.display = 'block';
+            for(let i=1; i<=10; i++) {
+                if([1,2,3,10].includes(i)) {
+                    qList.push({ id: `q${i}`, type: 'radio', options: [`q${i}_1`, `q${i}_2`, `q${i}_3`] });
+                } else {
+                    qList.push({ id: `sat_${i}`, labelKey: i==4?'sat_svc':i==5?'sat_att':i==6?'sat_pro':i==7?'sat_relax':i==8?'sat_book':'sat_total', type: 'radio', options: ['vs', 's', 'o', 'u', 'vu'] });
+                }
+            }
+        } else if (config.type === 'pasha') {
+            document.getElementById('masseurSection').style.display = 'none';
+            qList = [
+                { id: 'age', type: 'radio', options: ['age1','age2','age3','age4','age5'] },
+                { id: 'src', type: 'radio', options: ['src1','src2','src3','src4','src5','src6'] },
+                { id: 'svc', type: 'checkbox', options: ['svc1','svc2','svc3','svc4','svc5','svc6','svc9','svc15','svc16'] },
+                { id: 'sat_svc', type: 'radio', options: ['vs','s','o','u','vu'] },
+                { id: 'sat_book', type: 'radio', options: ['vs','s','o','u','vu'] },
+                { id: 'sat_env', type: 'radio', options: ['vs','s','o','u','vu'] },
+                { id: 'sat_intro', type: 'radio', options: ['vs','s','o','u','vu'] },
+                { id: 'sat_att', type: 'radio', options: ['vs','s','o','u','vu'] },
+                { id: 'sat_pro', type: 'radio', options: ['vs','o','vu'] },
+                { id: 'sat_relax', type: 'radio', options: ['vs','o','vu'] },
+                { id: 'sat_total', type: 'radio', options: ['vs','s','o','u','vu'] },
+                { id: 'rec', type: 'radio', options: ['y','n'] },
+                { id: 'rev', type: 'radio', options: ['y','n'] }
+            ];
+        } else if (config.type === 'jing') {
+            document.getElementById('masseurSection').style.display = 'none';
+            qList = [
+                { id: 'age', type: 'radio', options: ['age1','age2','age3','age4','age5'] },
+                { id: 'frm', type: 'radio', options: ['f_n','f_c','f_s','f_e'] },
+                { id: 'src', type: 'radio', options: ['src1','src2','src3','src4','src5','src6'] },
+                { id: 'rm', type: 'radio', options: ['rm1','rm2','rm3','rm4','rm5'] },
+                { id: 'sat_book', type: 'radio', options: ['vs','s','o','u','vu'] },
+                { id: 'sat_env', type: 'radio', options: ['vs','s','o','u','vu'] },
+                { id: 'sat_total', type: 'radio', options: ['vs','s','o','u','vu'] },
+                { id: 'rec', type: 'radio', options: ['y','n'] },
+                { id: 'rev', type: 'radio', options: ['y','n'] }
+            ];
+        }
+
+        qList.forEach((q, i) => {
             const html = `
                 <div class="bg-white p-6 question-card shadow-sm border border-gray-100">
-                    <p class="font-bold text-slate-800 mb-4 text-base leading-snug">
-                        <span data-i18n="${q.id}">---</span>
+                    <p class="font-black text-gray-800 mb-4 text-base leading-snug">
+                        <span class="text-blue-500 mr-1">${i+1}.</span> <span data-i18n="${q.labelKey || q.id}">...</span>
                     </p>
                     <div class="grid grid-cols-1 gap-2.5">
                         ${q.options.map(opt => `
-                            <label class="flex items-center p-4 border rounded-2xl border-gray-100 bg-slate-50/50 active:bg-blue-50 transition cursor-pointer">
-                                <input type="radio" name="${q.id}" value="${opt}" class="w-5 h-5 mr-3 text-blue-600" required> 
-                                <span class="text-slate-600 text-sm font-medium" data-i18n="${opt}">---</span>
+                            <label class="flex items-center p-4 border rounded-2xl border-gray-100 bg-gray-50/50 active:bg-blue-50 transition cursor-pointer">
+                                <input type="${q.type}" name="${q.id}" value="${opt}" class="w-5 h-5 mr-3 text-blue-600" ${q.type==='radio'?'required':''}> 
+                                <span class="text-slate-600 text-sm font-bold" data-i18n="${opt}">...</span>
                             </label>
                         `).join('')}
                     </div>
@@ -288,20 +276,18 @@
     }
 
     window.changeLang = function(lang) {
-        currentLang = lang;
+        activeLang = lang;
         document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
         document.getElementById(`btn-${lang}`).classList.add('active');
-
-        const dict = translations[lang] || translations['zh'];
-        
+        const d = dicts[lang] || dicts['zh'];
         document.querySelectorAll('[data-i18n]').forEach(el => {
-            const key = el.getAttribute('data-i18n');
-            el.innerHTML = dict[key] || translations['zh'][key] || key;
+            const k = el.getAttribute('data-i18n');
+            if (d[k]) el.innerHTML = d[k];
+            else if (dicts['zh'][k]) el.innerHTML = dicts['zh'][k];
         });
-
         document.querySelectorAll('[data-ph]').forEach(el => {
-            const key = el.getAttribute('data-ph');
-            el.placeholder = dict[key] || translations['zh'][key] || key;
+            const k = el.getAttribute('data-ph');
+            if (d[k]) el.placeholder = d[k];
         });
     };
 
@@ -309,39 +295,50 @@
         e.preventDefault();
         const btn = document.getElementById('submitBtn');
         btn.disabled = true;
-        btn.innerHTML = "Processing...";
+        btn.innerText = "Processing...";
 
         const payload = {
-            sid: new URLSearchParams(window.location.search).get('sid'),
-            store: activeConfig.name,
+            sid: activeSid,
+            store: STORE_MAP[activeSid].name,
             customer: document.getElementById('custName').value,
             phone: document.getElementById('custPhone').value,
-            feedback: document.getElementById('suggestions').value,
+            suggestions: document.getElementById('suggestions').value,
             masseurId: document.getElementById('masseurId').value || "N/A",
-            lang: currentLang,
+            lang: activeLang,
             data: {},
             timestamp: serverTimestamp()
         };
 
-        activeConfig.questions.forEach(q => {
-            const checked = document.querySelector(`input[name="${q.id}"]:checked`);
-            payload.data[q.id] = checked ? checked.value : null;
+        // 收集題目資料
+        document.querySelectorAll('#dynamicQuestions .question-card').forEach(card => {
+            const input = card.querySelector('input');
+            const name = input.name;
+            const type = input.type;
+            if (type === 'checkbox') {
+                payload.data[name] = Array.from(document.querySelectorAll(`input[name="${name}"]:checked`)).map(i => i.value);
+            } else {
+                const sel = document.querySelector(`input[name="${name}"]:checked`);
+                payload.data[name] = sel ? sel.value : null;
+            }
         });
 
         try {
-            await addDoc(collection(db, 'group_surveys', 'v1', 'responses'), payload);
+            await addDoc(collection(db, 'artifacts', internalAppId, 'public', 'data', 'submissions'), payload);
             document.getElementById('successModal').classList.replace('modal-hide', 'modal-show');
             window.scrollTo({ top: 0, behavior: 'smooth' });
         } catch (err) {
-            console.error("Error submitting", err);
+            console.error("Firebase Submission Error", err);
         } finally {
             btn.disabled = false;
-            btn.innerHTML = translations[currentLang].submitBtn;
+            btn.innerText = dicts[activeLang].submitBtn;
         }
     });
 
-    window.handleAction = (act) => {
-        if (act === 'Reviewed') window.open(activeConfig.google, "_blank");
+    window.handleMarketing = (act) => {
+        if (act === 'Reviewed') {
+            const storeUrl = STORE_MAP[activeSid]?.google || DEFAULT_GOOGLE;
+            window.open(storeUrl, '_blank');
+        }
         document.getElementById('successModal').classList.replace('modal-show', 'modal-hide');
     };
 
@@ -349,7 +346,7 @@
         if (user) {
             document.getElementById('submitBtn').disabled = false;
             document.getElementById('submitBtn').classList.remove('opacity-50');
-            document.getElementById('conn-info').innerText = "SECURE CLOUD CONNECTED";
+            document.getElementById('conn-status').innerText = "Encrypted Connection Established";
         }
     });
 
