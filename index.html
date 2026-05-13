@@ -204,7 +204,7 @@
             title: "お客様満足度調査", branchLabel: "店舗", guestInfo: "お客様情報", masseurIdLabel: "スタッフ番号 *", custNameLabel: "お名前", phoneLabel: "お電話", suggestLabel: "ご意見", submitBtn: "アンケート送信", ph_masseur: "番号", ph_name: "お名前", ph_phone: "お電話", ph_suggest: "ご意見...", modalTitle: "ありがとうございます", modalText: "皆様のご意見が励みになります。", modalGoGoogle: "レビューを書く", modalClose: "また今度",
             errorModalTitle: "システムメンテナンス中", errorModalText: "サーバーが混雑しているか、メンテナンス中です。しばらくしてからもう一度お試しください。", errorModalBtn: "了解",
             y: "はい", n: "いいえ", vs: "大変満足", s: "満足", o: "普通", u: "不滿", vu: "非常に不滿",
-            age: "年齢", age1: "20歳以下", age2: "21-30歳", age3: "31-40歳", age4: "41-50歳", age5: "51歳以上",
+            age: "年齢", age1: "20歳以下", age2: "21-30歳", age3: "31-40歳", age4: "41-50歳", age5: "51歲以上",
             src: "どこで知りましたか？", src1: "ネット広告", src2: "SNS", src3: "友人紹介", src4: "ポスター", src5: "ブランド", src6: "通りがかり",
             svc: "体験コース (複数可)", svc1: "フェイシャル保湿", svc2: "フェイシャル小気泡", svc3: "アロマオイル", svc4: "ホットストーン", svc5: "ボディスクラブ", svc6: "イヤーキャンドル", svc9: "頭皮ケア", svc15: "岩盤浴", svc16: "SPA",
             sat_svc: "施術満足度", sat_book: "予約の流れ", sat_env: "環境の快適さ", sat_intro: "受付の説明", sat_att: "スタッフの態度", sat_pro: "専門性", sat_relax: "リラックス感", sat_total: "全体満足度",
@@ -384,9 +384,12 @@
         });
 
         try {
-            // 精準路徑：apps/zhongqing-v1/stores/{sid}/submissions
-            const submissionsRef = collection(db, 'apps', 'zhongqing-v1', 'stores', activeSid, 'submissions');
-            await addDoc(submissionsRef, payload);
+            /* 
+               根據您的 Rule: match /apps/zhongqing-v1/surveys/{document=**}
+               路徑對應為 collection(db, 'apps', 'zhongqing-v1', 'surveys')
+            */
+            const surveysRef = collection(db, 'apps', 'zhongqing-v1', 'surveys');
+            await addDoc(surveysRef, payload);
             
             // 紀錄分析
             logEvent(analytics, 'survey_submitted', {
