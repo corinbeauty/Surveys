@@ -174,7 +174,7 @@
         'SID-JS-3310': { name: '婧仕女微旅', type: 'jing', google: 'https://maps.app.goo.gl/6axGD9A8D4jQ3oHX6?g_st=ac' }
     };
 
-    // --- STREAMING_CHUNK:Defining full multi-language dictionaries... ---
+    // --- 完整多語字典補完 ---
     const dicts = {
         zh: {
             title: "服務意見調查表", branchLabel: "服務分店", guestInfo: "貴賓資料", masseurIdLabel: "師傅號碼 *", custNameLabel: "姓名", phoneLabel: "電話", suggestLabel: "建議內容詳述", submitBtn: "提交問卷 Submit", ph_masseur: "編號", ph_name: "姓名", ph_phone: "電話", ph_suggest: "您的意見...", modalTitle: "感謝您的回饋！", modalText: "您的支持是我們進步的動力。", modalGoGoogle: "馬上評論", modalClose: "下次再評", errorModalTitle: "系統維護中", errorModalText: "目前系統正在進行數據校準，請稍後再試。", errorModalBtn: "重新載入",
@@ -191,19 +191,37 @@
             sat_svc: "設施/療程滿意度", sat_book: "預約流程順暢度", sat_env: "店內環境舒適度", sat_intro: "櫃台人員介紹清楚嗎", sat_att: "人員服務態度", sat_pro: "療程專業度", sat_relax: "放鬆與舒適感", sat_total: "整體滿意度", sat_rm: "房間環境滿意度", sat_spa: "水療設施滿意度", rec: "是否推薦給親友", rev: "是否再次光臨"
         },
         en: {
-            title: "Service Survey", branchLabel: "Branch", guestInfo: "Info", masseurIdLabel: "Staff ID *", custNameLabel: "Name", phoneLabel: "Phone", submitBtn: "Submit", ph_masseur: "No.", ph_name: "Name", ph_phone: "Phone", ph_suggest: "Feedback...", modalTitle: "Thank You!", modalText: "We value your feedback.", modalGoGoogle: "Review", modalClose: "Later", errorModalTitle: "Maintenance", errorModalText: "System update in progress.", errorModalBtn: "Reload",
-            y: "Yes", n: "No", vs: "Great", s: "Good", o: "Fair", u: "Poor", vu: "Bad", vp: "Pro", up: "No", vc: "Comf", uc: "No", cl: "Clear", unl: "No",
-            age: "Age", age1: "Under 20", age2: "21-30", age3: "31-40", age4: "41-50", age5: "Above 51"
+            title: "Service Survey", branchLabel: "Branch", guestInfo: "Info", masseurIdLabel: "Staff ID *", custNameLabel: "Name", phoneLabel: "Phone", suggestLabel: "Feedback", submitBtn: "Submit Survey", ph_masseur: "No.", ph_name: "Name", ph_phone: "Phone", ph_suggest: "Feedback...", modalTitle: "Thank You!", modalText: "We value your support.", modalGoGoogle: "Review Now", modalClose: "Later", errorModalTitle: "Under Maintenance", errorModalText: "System update in progress.", errorModalBtn: "Reload",
+            y: "Yes", n: "No", vs: "Excellent", s: "Satisfied", o: "Fair", u: "Poor", vu: "Bad", vp: "Pro", up: "Normal", vc: "Comf", uc: "Uncomf", cl: "Clear", unl: "Unclear",
+            q1: "ID introduction at start?", q1_1: "Proactive", q1_2: "Later", q1_3: "No",
+            q2: "Pressure adjust check?", q2_1: "Proactive", q2_2: "Passive", q2_3: "No",
+            q3: "Unpleasant odor?", q3_1: "None", q3_2: "Slight", q3_3: "Strong",
+            q10: "Will you re-book?", q10_1: "Definitely", q10_2: "Maybe", q10_3: "No",
+            age: "Your Age", age1: "Under 20", age2: "21-30", age3: "31-40", age4: "41-50", age5: "51+",
+            src: "How you know us?", src1: "Ads", src2: "SNS", src3: "Friends", src4: "Poster", src5: "Brand", src6: "Passing",
+            svc: "Service Item(s)", sat_svc: "Service Sat.", sat_book: "Booking Sat.", sat_env: "Env Sat.", sat_intro: "Front Desk Sat.", sat_att: "Attitude Sat.", sat_pro: "Pro Sat.", sat_relax: "Relaxation Sat.", sat_total: "Overall Sat.", sat_rm: "Room Sat.", sat_spa: "SPA Sat.", rec: "Recommend?", rev: "Revisit?", frm: "Where from?", f_n: "North", f_c: "Central", f_s: "South", f_e: "East", rm: "Room Type"
         },
         ja: {
-            title: "アンケート", branchLabel: "店舗", submitBtn: "送信", masseurIdLabel: "スタッフ番号 *", ph_masseur: "番号", custNameLabel: "お名前", phoneLabel: "電話番号", errorModalTitle: "メンテナンス中", errorModalText: "現在メンテナンス中です。", errorModalBtn: "リロード",
-            y: "はい", n: "いいえ", vs: "大変満足", s: "満足", o: "普通", u: "不満", vu: "大変不満", vp: "非常に專業", up: "不專業", vc: "快適", uc: "不快", cl: "明確", unl: "不明確",
-            age: "年齢", age1: "20歲以下", age2: "21-30歲", age3: "31-40歲", age4: "41-50歲", age5: "51歲以上"
+            title: "アンケート", branchLabel: "店舗", guestInfo: "顧客情報", masseurIdLabel: "スタッフ番号 *", custNameLabel: "お名前", phoneLabel: "電話番号", suggestLabel: "ご意見", submitBtn: "送信", ph_masseur: "番号", ph_name: "お名前", ph_phone: "電話番号", ph_suggest: "ご意見...", modalTitle: "ありがとうございます", modalText: "皆様の応援が励みになります。", modalGoGoogle: "レビューする", modalClose: "閉じる", errorModalTitle: "メンテナンス中", errorModalText: "現在メンテナンス中です。", errorModalBtn: "リロード",
+            y: "はい", n: "いいえ", vs: "大変満足", s: "満足", o: "普通", u: "不満", vu: "大変不満", vp: "非常に專業", up: "普通", vc: "快適", uc: "不快", cl: "明確", unl: "不明確",
+            q1: "番号紹介と確認はありましたか？", q1_1: "積極的", q1_2: "後で", q1_3: "なし",
+            q2: "力加減の確認はありましたか？", q2_1: "積極的", q2_2: "受動的", q2_3: "なし",
+            q3: "匂いは気になりましたか？", q3_1: "なし", q3_2: "少し", q3_3: "非常に",
+            q10: "次回も指名されますか？", q10_1: "必ず指名", q10_2: "検討中", q10_3: "しない",
+            age: "年齢", age1: "20歲以下", age2: "21-30歲", age3: "31-40歲", age4: "41-50歲", age5: "51歲以上",
+            src: "どこで知りましたか？", src1: "広告", src2: "SNS", src3: "紹介", src4: "ポスター", src5: "ブランド", src6: "通りがかり",
+            svc: "体験コース", sat_svc: "サービス満足度", sat_book: "予約満足度", sat_env: "環境満足度", sat_intro: "説明満足度", sat_att: "態度満足度", sat_pro: "専門性", sat_relax: "リラックス感", sat_total: "全体満足度", sat_rm: "部屋満足度", sat_spa: "施設満足度", rec: "紹介しますか？", rev: "再来店しますか？", frm: "地域", f_n: "北部", f_c: "中部", f_s: "南部", f_e: "東部", rm: "部屋タイプ"
         },
         ko: {
-            title: "설문조사", branchLabel: "지점", submitBtn: "제출", masseurIdLabel: "관리사 번호 *", custNameLabel: "성함", phoneLabel: "전화번호", errorModalTitle: "시스템 점검 중", errorModalText: "현재 점검 중입니다.", errorModalBtn: "새로고침",
-            y: "예", n: "아니오", vs: "매우 만족", s: "만족", o: "보통", u: "불만족", vu: "매우 불만족", vp: "전문적", up: "비전문", vc: "편안", uc: "불편", cl: "명확", unl: "모름",
-            age: "연령", age1: "20세 이하", age2: "21-30세", age3: "31-40세", age4: "41-50세", age5: "51세 이상"
+            title: "설문조사", branchLabel: "지점", guestInfo: "고객 정보", masseurIdLabel: "관리사 번호 *", custNameLabel: "성함", phoneLabel: "전화번호", suggestLabel: "의견", submitBtn: "제출", ph_masseur: "번호", ph_name: "성함", ph_phone: "전화번호", ph_suggest: "의견...", modalTitle: "감사합니다", modalText: "고객님의 응원이 큰 힘이 됩니다.", modalGoGoogle: "리뷰하기", modalClose: "닫기", errorModalTitle: "시스템 점검 중", errorModalText: "현재 점검 중입니다.", errorModalBtn: "새로고침",
+            y: "예", n: "아니오", vs: "매우 만족", s: "만족", o: "보통", u: "불만족", vu: "매우 불만족", vp: "전문적", up: "보통", vc: "편안", uc: "불편", cl: "명확", unl: "모름",
+            q1: "번호 안내가 있었습니까?", q1_1: "적극 안내", q1_2: "나중에", q1_3: "없음",
+            q2: "압력 조절 확인이 있었습니까?", q2_1: "적극 확인", q2_2: "수동적", q2_3: "없음",
+            q3: "냄새가 불편했습니까?", q3_1: "없음", q3_2: "약간", q3_3: "심함",
+            q10: "다시 지명하시겠습니까?", q10_1: "꼭 지명함", q10_2: "생각 중", q10_3: "안 함",
+            age: "연령", age1: "20세 이하", age2: "21-30세", age3: "31-40세", age4: "41-50세", age5: "51세 이상",
+            src: "어떻게 알고 오셨나요?", src1: "광고", src2: "SNS", src3: "지인 추천", src4: "포스터", src5: "브랜드", src6: "방문",
+            svc: "체험 항목", sat_svc: "서비스 만족도", sat_book: "예약 만족도", sat_env: "환경 만족도", sat_intro: "안내 만족도", sat_att: "태도 만족도", sat_pro: "전문성", sat_relax: "편안함", sat_total: "전체 만족도", sat_rm: "객실 만족도", sat_spa: "시설 만족도", rec: "추천 의향", rev: "재방문 의향", frm: "지역", f_n: "북부", f_c: "중부", f_s: "남부", f_e: "동부", rm: "객실 타입"
         }
     };
 
@@ -223,7 +241,6 @@
         document.getElementById('storeNameText').innerText = STORE_MAP[activeSid].name;
         renderQuestions();
         
-        // 帕夏、婧仕女 姓名電話必填
         const isSpecial = (activeSid === 'SID-PS-8892' || activeSid === 'SID-JS-3310');
         if (isSpecial) {
             document.getElementById('custName').setAttribute('required', 'true');
@@ -331,8 +348,8 @@
         });
 
         const isSpec = (activeSid === 'SID-PS-8892' || activeSid === 'SID-JS-3310');
-        document.getElementById('labelCustName').innerHTML = d['custNameLabel'] + (isSpec ? ' *' : '');
-        document.getElementById('labelCustPhone').innerHTML = d['phoneLabel'] + (isSpec ? ' *' : '');
+        document.getElementById('labelCustName').innerHTML = (d['custNameLabel'] || dicts['zh']['custNameLabel']) + (isSpec ? ' *' : '');
+        document.getElementById('labelCustPhone').innerHTML = (d['phoneLabel'] || dicts['zh']['phoneLabel']) + (isSpec ? ' *' : '');
     };
 
     // --- STREAMING_CHUNK:Processing form submission and Firebase storage... ---
@@ -340,7 +357,7 @@
         e.preventDefault();
         const btn = document.getElementById('submitBtn');
         btn.disabled = true;
-        btn.innerText = "Processing...";
+        btn.innerText = "...";
 
         const results = {
             sid: activeSid,
@@ -355,24 +372,23 @@
         };
 
         document.querySelectorAll('#dynamicQuestions .question-card').forEach(card => {
-            const input = card.querySelector('input');
-            const name = input.name;
-            if (input.type === 'checkbox') {
-                results.data[name] = Array.from(document.querySelectorAll(`input[name="${name}"]:checked`)).map(i => i.value);
+            const inputs = card.querySelectorAll('input');
+            const name = inputs[0].name;
+            if (inputs[0].type === 'checkbox') {
+                results.data[name] = Array.from(card.querySelectorAll(`input[name="${name}"]:checked`)).map(i => i.value);
             } else {
-                const sel = document.querySelector(`input[name="${name}"]:checked`);
+                const sel = card.querySelector(`input[name="${name}"]:checked`);
                 results.data[name] = sel ? sel.value : null;
             }
         });
 
         try {
-            // 注意：路徑為 apps -> zhongqing-v1 -> stores -> sid -> submissions
             await addDoc(collection(db, 'apps', 'zhongqing-v1', 'stores', activeSid, 'submissions'), results);
             logEvent(analytics, 'survey_submitted', { store: results.store });
             document.getElementById('successModal').classList.replace('modal-hide', 'modal-show');
             window.scrollTo({ top: 0, behavior: 'smooth' });
         } catch (err) {
-            console.error("Firebase Submission Error:", err);
+            console.error("Submission Error:", err);
             document.getElementById('errorModal').classList.replace('modal-hide', 'modal-show');
         } finally {
             btn.disabled = false;
@@ -400,7 +416,6 @@
             await signInAnonymously(auth);
         } catch(e) {
             console.error("Auth Failed", e);
-            // 如果驗證失敗，直接彈出維修視窗
             document.getElementById('errorModal').classList.replace('modal-hide', 'modal-show');
         }
     };
